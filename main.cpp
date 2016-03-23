@@ -30,6 +30,7 @@ int main(int argc, char **argv)
 	{
 		int command = getch();
 		if (Manager.keyCallback(command)) break;
+		Manager.unitsMove();
 		Manager.refreshGrid();
 	}
 	endwin();

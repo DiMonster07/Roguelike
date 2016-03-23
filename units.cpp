@@ -28,7 +28,19 @@ void Character::setCoordinates(int x, int y)
 	this->y = y;
 }
 
-void Knight::move(Map &m, courseX x, courseY y)
+void Monster::move(Map &m, int x, int y)
+{
+	if (m.map[this->y + y][this->x + x] == '.')
+	{
+		m.map[this->y][this->x] = '.';
+		m.map[this->y + y][this->x + x] = 'Z';		
+		this->x += x;
+		this->y += y;
+	}
+}
+
+
+void Knight::move(Map &m, int x, int y)
 {
 	if (m.map[this->y + y][this->x + x] == '.')
 	{

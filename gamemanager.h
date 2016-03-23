@@ -24,6 +24,7 @@ public:
 	std::vector<Character*> monsters;
 	GameManager(const char *name_map);
 	int keyCallback(int key);
+	void unitsMove();
 	void selectStartPos(WINDOW *win);
 	void addUnit(char c, int x, int y);
 	void generateUnits();
