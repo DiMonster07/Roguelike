@@ -39,13 +39,12 @@ void Monster::move(Map &m, int x, int y)
 	}
 }
 
-
 void Knight::move(Map &m, int x, int y)
 {
 	if (m.map[this->y + y][this->x + x] == '.')
 	{
 		m.map[this->y][this->x] = '.';
-		m.map[this->y + y][this->x + x] = 'K';		
+		m.map[this->y + y][this->x + x] = 'K';
 		this->x += x;
 		this->y += y;
 	}

@@ -5,7 +5,8 @@
 #include <ctime>
 #include <unistd.h>
 
-const int att_range = 3;
+const int att_range = 2;
+long long seed;
 
 GameManager::GameManager(const char *name_map)
 {
@@ -17,6 +18,7 @@ void GameManager::refreshInfo()
 	mvprintw(0, 61, "%s", "INFO");
 	mvprintw(1, 61, "%s%d", "Health: " ,this->heroes[0]->hitPoints());
 	mvprintw(2, 61, "%s%d", "Damage: " ,this->heroes[0]->damage());
+	mvprintw(3, 61, "%s%d, %d", "Koordinate: ", this->heroes[0]->getX(), this->heroes[0]->getY());
 }
 
 void GameManager::refreshGrid()
@@ -51,6 +53,7 @@ void GameManager::generateUnits()
 			i++;
 		}
 	}
+	seed = time(0);
 }
 
 void GameManager::selectStartPos(WINDOW *win)
@@ -87,25 +90,28 @@ int GameManager::keyCallback(int key)
 
 void GameManager::unitsMove()
 {
+	srand(seed++);
 	int x_k = this->heroes[0]->getX();
 	int y_k = this->heroes[0]->getY();
 	for (int i = 0; i < this->monsters.size(); i++)
 	{
-		srand(time(0));
 		int x_m = this->monsters[i]->getX();
 		int y_m = this->monsters[i]->getY();
-		if ((x_m + att_range >= x_k) || (x_m - att_range <= x_k) &&
-			(y_m + att_range >= y_k) || (y_m - att_range <= y_k))
+		if ((abs(x_m - x_k) <= att_range) && (abs(y_m - y_k) <= att_range))
 		{
 			x_m = (x_k - x_m) < 0 ? -1 : 1;
 			y_m = (y_k - y_m) < 0 ? -1 : 1;
 		}
 		else
 		{
-			x_m = rand() % 2 - 1;
-			y_m = rand() % 2 - 1;	
+			x_m = rand() % 3 - 1;
+			y_m = rand() % 3 - 1;	
 		}
 		this->monsters[i]->move(this->map, x_m, y_m);
+		x_m = this->monsters[i]->getX();
+		y_m = this->monsters[i]->getY();	
+		if (abs(x_m - x_k) == 1 && abs(y_m - y_k) == 1)
+			this->heroes[0]->collide(this->monsters[i]);
 	}
 }
 
@@ -113,9 +119,9 @@ void GameManager::addUnit(char c, int x, int y)
 {
 	 switch(c)
 	 {
-	 	case 'P': this->heroes.push_back(new Princess(1, 0, x, y)); 
-	 	case 'Z': this->monsters.push_back(new Zombie(4, 1, x, y));
-	 	case 'D': this->monsters.push_back(new Dragon(70, 25, x, y));
+	 	case 'P': this->heroes.push_back(new Princess(1, 0, x, y)); break; 
+	 	case 'Z': this->monsters.push_back(new Zombie(4, 1, x, y)); break;
+	 	case 'D': this->monsters.push_back(new Dragon(70, 25, x, y)); break;
 	 }
 	 this->map.addCharacter(c, x, y);
 }

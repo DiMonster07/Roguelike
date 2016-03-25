@@ -1,15 +1,16 @@
 #pragma once
 #include "map.h"
 
-class BaseCharacter
+class Object
 {
 public:
+	virtual void collide(class Object* ch) = 0;
 	virtual void collide(class Character* ch) = 0;
 	virtual void collide(class Knight* ch) = 0;
 	virtual void collide(class Monster* ch) = 0;
 };
 
-class Character: public BaseCharacter
+class Character: public Object
 {
 protected:
 	int health, damag, x, y;
@@ -18,6 +19,7 @@ public:
 	virtual void move(Map &m, int x, int y) {};
 	virtual int hitPoints();
 	virtual int damage();
+	void collide(class Object* ch) {};
 	void collide(class Character* ch) {};
 	void collide(class Knight* ch) {};
 	void collide(class Monster* ch) {};
@@ -31,7 +33,7 @@ class Knight: public Character
 public:
 	Knight (int h = 1, int d = 0, int i = 0, int j = 0) : Character (h, d, i, j) {};
 	void move(Map &m, int x, int y);
-	void collide(class Monster* ch) {};
+	//void collide(class Monster* ch) {};
 };
 
 class Princess: public Character

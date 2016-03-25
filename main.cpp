@@ -3,6 +3,8 @@
 #include <fstream>
 #include <typeinfo>
 #include "gamemanager.h"
+#include <stdlib.h>
+#include <ctime>
 
 
 const char *dir = "map.txt";
@@ -11,15 +13,16 @@ void initColorPairs();
 
 int main(int argc, char **argv)
 {
+	srand(time(0));
 	initscr();
 	curs_set(0);
 	noecho();
 	cbreak();
 	keypad(stdscr, TRUE);
-	WINDOW *win = newwin(30, 80, 0, 0);
 	clear();
 	start_color();
 	initColorPairs();
+	WINDOW *win = newwin(30, 80, 0, 0);
  	GameManager Manager(dir);
  	mvprintw(0, 0, "%s", "Please, select you start position. After selected press SPACE");
  	getch();
