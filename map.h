@@ -1,4 +1,7 @@
 #pragma once
+#include <ncurses.h>
+#include <panel.h>
+
 class Map 
 {		
 public:
@@ -7,5 +10,5 @@ public:
 	Map() {};
 	Map(const char *name_map);
 	void addCharacter(char ch, int x, int y);
-	void printMap();
+	void printMap(WINDOW *win);
 };

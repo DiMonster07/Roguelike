@@ -19,13 +19,16 @@ enum COLORS_UNITS
 class GameManager
 {
 public:
+	WINDOW *game_win, *info_win;
 	Map map;
-	std::vector<Character*> heroes;
-	std::vector<Character*> monsters;
+	Knight *knight;
+	Princess *princess;
+	std::vector<Actor*> actors;
 	GameManager(const char *name_map);
+	void createWins();
 	int keyCallback(int key);
 	void unitsMove();
-	void selectStartPos(WINDOW *win);
+	void selectStartPos();
 	void addUnit(char c, int x, int y);
 	void generateUnits();
 	void refreshGrid();

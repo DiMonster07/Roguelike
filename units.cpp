@@ -7,22 +7,27 @@ int Character::hitPoints()
 	return this->health;
 }
 
-int Character::damage()
+int Character::get_damage()
 {
-	return this->damag;
+	return this->damage;
 }
 
-int Character::getX()
+void Character::set_hp(int value)
+{
+	this->health = value;
+}
+
+int Actor::getX()
 {
 	return this->x;
 }
 
-int Character::getY()
+int Actor::getY()
 {
 	return this->y;
 }
 
-void Character::setCoordinates(int x, int y)
+void Actor::setCoordinates(int x, int y)
 {
 	this->x = x;
 	this->y = y;
