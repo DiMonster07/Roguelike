@@ -1,14 +1,6 @@
-#include <stdio.h>
-#include <iostream>
-#include <fstream>
-#include <typeinfo>
-#include "gamemanager.h"
-#include <stdlib.h>
 #include <ctime>
-#include <unistd.h>
-
-
-const char *dir = "map.txt";
+#include <stdlib.h>
+#include "gamemanager.h"
 
 void initColorPairs();
 
@@ -22,25 +14,25 @@ int main(int argc, char **argv)
 	start_color();
 	initColorPairs();
 	clear();
-	GameManager Manager(dir);
-	Manager.createWins();
-	keypad(Manager.game_win, TRUE);
- 	mvwprintw(Manager.game_win, 0, 1, "%s\n %s", "Please, select you start position.", 
+	srand(time(0));
+	GameManager::instance().createGrids();
+	keypad(GameManager::instance().game_win, TRUE);
+ 	mvwprintw(GameManager::instance().game_win, 0, 1, "%s\n %s", 
+ 		"Please, select you start position.", 
  		"After selected press SPACE. Press any key now...");
- 	wrefresh(Manager.game_win);
- 	wgetch(Manager.game_win);
- 	Manager.selectStartPos();
- 	Manager.generateUnits();
- 	Manager.refreshGrid();
+ 	wrefresh(GameManager::instance().game_win);
+ 	wgetch(GameManager::instance().game_win);
+ 	GameManager::instance().selectStartPos();
+ 	GameManager::instance().generateUnits();
+ 	GameManager::instance().refreshGrid();
 	while (1)
 	{
-		int command = wgetch(Manager.game_win);
-		if (Manager.keyCallback(command)) break;
-		Manager.unitsMove();
-		Manager.refreshGrid();
+		int command = wgetch(GameManager::instance().game_win);
+		if (GameManager::instance().keyCallback(command)) break;
+		GameManager::instance().unitsMove();
+		GameManager::instance().refreshGrid();
 	}
-	delwin(Manager.game_win);
-	delwin(Manager.info_win);
+	GameManager::instance().deleteGrids();
 	endwin();
 	return 0;
 }
@@ -49,7 +41,7 @@ void initColorPairs()
 {
 	init_pair(BASE, 7, 0);
 	init_pair(WALL, 0, 0);
-	init_pair(LEA, 7, 7);
+	init_pair(GROUND, 7, 7);
 	init_pair(KNIGHT, 1, 7);
 	init_pair(PRINCESS, 7, 5);
 	init_pair(ZOMBIE, 2, 7);

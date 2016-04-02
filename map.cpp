@@ -1,5 +1,6 @@
 #include "map.h"
 #include "gamemanager.h"
+#include "units.h"
 #include <malloc.h>
 #include <fstream>
 #include <iostream>
@@ -35,18 +36,18 @@ void Map::printMap(WINDOW *win)
 		{
 			switch (this->map[i][j])
 			{
-				case '#': wattron(win, COLOR_PAIR(WALL)); mvwprintw(win, i, j, "%c", this->map[i][j]); 
-					break;
-				case '.': wattron(win, COLOR_PAIR(LEA)); mvwprintw(win, i, j, "%c", this->map[i][j]); 
-					break;
-				case 'K': wattron(win, COLOR_PAIR(KNIGHT)); mvwprintw(win, i, j, "%c", this->map[i][j]); 
-					break;
-				case 'P': wattron(win, COLOR_PAIR(PRINCESS)); mvwprintw(win, i, j, "%c", this->map[i][j]); 
-					break;
-				case 'D': wattron(win, COLOR_PAIR(DRAGON)); mvwprintw(win, i, j, "%c", this->map[i][j]); 
-					break;
-				case 'Z': wattron(win, COLOR_PAIR(ZOMBIE)); mvwprintw(win, i, j, "%c", this->map[i][j]); 
-					break;
+				case WALL_SYMBOL: wattron(win, COLOR_PAIR(WALL)); mvwprintw(win, i, j, 
+					"%c", this->map[i][j]); break;
+				case GROUND_SYMBOL: wattron(win, COLOR_PAIR(GROUND)); mvwprintw(win, 
+					i, j, "%c", this->map[i][j]); break;
+				case KNIGHT_SYMBOL: wattron(win, COLOR_PAIR(KNIGHT)); mvwprintw(win, 
+					i, j, "%c", this->map[i][j]); break;
+				case PRINCESS_SYMBOL: wattron(win, COLOR_PAIR(PRINCESS)); mvwprintw(win,
+					i, j, "%c", this->map[i][j]); break;
+				case DRAGON_SYMBOL: wattron(win, COLOR_PAIR(DRAGON)); mvwprintw(win, 
+					i, j, "%c", this->map[i][j]); break;
+				case ZOMBIE_SYMBOL: wattron(win, COLOR_PAIR(ZOMBIE)); mvwprintw(win, 
+					i, j, "%c", this->map[i][j]); break;
 			}
 		}
 	}
