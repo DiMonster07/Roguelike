@@ -1,103 +1,35 @@
 #include "gamemanager.h"
-#include <iostream>
-#include <fstream>
 #include <stdlib.h>
 #include <ctime>
 #include <unistd.h>
 
-const int att_range = 2;
-long long seed;
+const int vis_range = 3;
+const int att_range = 1;
 
-GameManager::GameManager(const char *name_map)
+const char *dir = "map.txt";
+
+void GameManager::collide(Actor* left, Actor* right)
 {
-	this->map = Map(name_map);
+	left->collide(right);
 }
 
-void GameManager::refreshInfo()
+Actor* GameManager::getActor(int x, int y)
 {
-	mvprintw(0, 61, "%s", "INFO");
-	mvprintw(1, 61, "%s%d", "Health: " ,this->heroes[0]->hitPoints());
-	mvprintw(2, 61, "%s%d", "Damage: " ,this->heroes[0]->damage());
-	mvprintw(3, 61, "%s%d, %d", "Koordinate: ", this->heroes[0]->getX(), this->heroes[0]->getY());
-}
-
-void GameManager::refreshGrid()
-{
-	this->map.printMap();
-	this->refreshInfo();
-	refresh();
-}
-
-void GameManager::generateUnits()
-{
-	int x = this->heroes[0]->getX();
-	int y = this->heroes[0]->getY();
-	while (1)
-	{
-		x = (x > this->map.cols/2 - 1) ? x - this->map.cols/2 + 1 : 
-			x + this->map.cols/2 - 1;
-		y = (y > this->map.rows/2 - 1) ? y - this->map.rows/2 + 1 : 
-			y + this->map.rows/2 - 1;
-		if (this->map.map[y][x] == '.') break;
-	}
-	this->addUnit('P', x, y);
-	int i = 0;
-	srand(time(0));
-	while(i < 30)
-	{
-		x = rand() % (this->map.cols - 1) + 1;
-		y = rand() % (this->map.rows - 1) + 1;
-		if (this->map.map[y][x] == '.')
-		{
-			this->addUnit('Z', x, y);
-			i++;
-		}
-	}
-	seed = time(0);
-}
-
-void GameManager::selectStartPos(WINDOW *win)
-{
-	clear();
-	this->heroes.push_back(new Knight(30, 3, 1, 1));
-	this->refreshGrid();
-	while(1)
-	{
-		int command = getch();
-		if (command == ' ') break;
-		this->keyCallback(command);
-		this->refreshGrid();
-	}
-	clear();
-	refresh();
-	mvprintw(0, 0, "%s", "Please press any key. Good luck!");
-	getch();
-	clear();
-}
-
-int GameManager::keyCallback(int key)
-{
-	switch(key)
-	{
-		case KEY_UP: this->heroes[0]->move(this->map, 0, -1); break;
-		case KEY_DOWN: this->heroes[0]->move(this->map, 0, 1); break;
-		case KEY_RIGHT: this->heroes[0]->move(this->map, 1, 0); break;
-		case KEY_LEFT: this->heroes[0]->move(this->map, -1, 0); break;
-		case 27: return 1;
-	}
+	for (int i = 0; i < this->actors.size(); i++)
+ 		if (this->actors[i]->getX() == x && this->actors[i]->getY() == y)
+ 			return this->actors[i];
 	return 0;
 }
 
 void GameManager::unitsMove()
 {
-	srand(seed++);
-	int x_k = this->heroes[0]->getX();
-	int y_k = this->heroes[0]->getY();
-	for (int i = 0; i < this->monsters.size(); i++)
+	int x_k = this->knight->getX();
+	int y_k = this->knight->getY();
+	for (int i = 0; i < this->actors.size(); i++)
 	{
-		int x_m = this->monsters[i]->getX();
-		int y_m = this->monsters[i]->getY();
-		if ((abs(x_m - x_k) <= att_range) && (abs(y_m - y_k) <= att_range))
+		int x_m = this->actors[i]->getX();
+		int y_m = this->actors[i]->getY();
+		if ((abs(x_m - x_k) <= vis_range) && (abs(y_m - y_k) <= vis_range))
 		{
 			x_m = (x_k - x_m) < 0 ? -1 : 1;
 			y_m = (y_k - y_m) < 0 ? -1 : 1;
@@ -107,22 +39,144 @@ void GameManager::unitsMove()
 			x_m = rand() % 3 - 1;
 			y_m = rand() % 3 - 1;	
 		}
-		this->monsters[i]->move(this->map, x_m, y_m);
-		x_m = this->monsters[i]->getX();
-		y_m = this->monsters[i]->getY();	
-		if (abs(x_m - x_k) == 1 && abs(y_m - y_k) == 1)
-			this->heroes[0]->collide(this->monsters[i]);
+		this->actors[i]->move(this->map, x_m, y_m);
+		x_m = this->actors[i]->getX();
+		y_m = this->actors[i]->getY();
+		if (abs(x_m - x_k) <= 1 && abs(y_m - y_k) <= 1)
+			this->collide(this->knight, this->actors[i]);
 	}
 }
 
-void GameManager::addUnit(char c, int x, int y)
+void GameManager::knightAttack()
+{
+	int x_a = this->knight->getX();
+	int y_a = this->knight->getY();
+	for (int x = x_a - att_range; x <= x_a + att_range; x++)
+		for (int y = y_a - att_range; y <= y_a + att_range; y++)	
+			if (((x_a != x) || (y_a != y)) && (this->map.map[y][x] != WALL_SYMBOL))
+			{
+				int a;
+				switch (this->map.map[y][x])
+				{
+					case PRINCESS_SYMBOL: break;
+					case ZOMBIE_SYMBOL:
+						
+						this->collide(this->getActor(x, y), this->knight); 
+						break;
+					case DRAGON_SYMBOL: break;
+				}
+			}
+}
+
+void GameManager::generateUnits()
+{
+	int x = this->knight->getX();
+	int y = this->knight->getY();
+	while (1)
+	{
+		int xn = rand() % (this->map.cols - 2) + 1;
+		int yn = rand() % (this->map.rows - 2) + 1;
+		if ((abs(x - xn) >= this->map.cols / 2 - 1) && 
+			(abs(y - yn) >= this->map.rows / 2 - 1) &&
+			(this->map.map[yn][xn] == '.')) 
+		{
+			x = xn;
+			y = yn;
+			break;
+		}
+	}
+	this->addActor('P', x, y);
+	int i = 0;
+	while(i < 30)
+	{
+		x = rand() % (this->map.cols - 1) + 1;
+		y = rand() % (this->map.rows - 1) + 1;
+		if (this->map.map[y][x] == '.')
+		{
+			this->addActor('Z', x, y);
+			i++;
+		}
+	}
+}
+
+int GameManager::keyCallback(int key)
+{
+	switch(key)
+	{
+		case KEY_UP: this->knight->move(this->map, 0, -1); break;
+		case KEY_DOWN: this->knight->move(this->map, 0, 1); break;
+		case KEY_RIGHT: this->knight->move(this->map, 1, 0); break;
+		case KEY_LEFT: this->knight->move(this->map, -1, 0); break;
+		case KEY_DAMAGE: this->knightAttack(); break;
+		case 27: return 1;
+	}
+	return 0;
+}
+
+GameManager::GameManager(const char *name_map)
+{
+	this->map = Map(name_map);
+}
+
+void GameManager::refreshInfo()
+{
+	wclear(this->info_win);
+	mvwprintw(this->info_win, 0, 0, "%s", "INFO");
+	mvwprintw(this->info_win, 1, 0, "Health: %d", this->knight->get_hp());
+	mvwprintw(this->info_win, 2, 0, "Damage: %d", this->knight->get_damage());
+	mvwprintw(this->info_win, 3, 0, "Сoordinate: %d %d", this->knight->getX(), 
+		this->knight->getY());
+	wrefresh(this->info_win);
+}
+
+void GameManager::selectStartPos()
+{
+	this->knight = new Knight(100, 3, 1, 1);
+	this->refreshGrid();
+	while(1)
+	{
+		int command = wgetch(this->game_win);
+		if (command == ' ') break;
+		this->keyCallback(command);
+		this->refreshGrid();
+	}
+	wrefresh(this->game_win);
+	mvwprintw(this->game_win, 0, 0, "%s", "Please press any key. Good luck!");
+	wgetch(this->game_win);
+	clear();
+}
+
+void GameManager::addActor(char c, int x, int y)
 {
 	 switch(c)
 	 {
-	 	case 'P': this->heroes.push_back(new Princess(1, 0, x, y)); break; 
-	 	case 'Z': this->monsters.push_back(new Zombie(4, 1, x, y)); break;
-	 	case 'D': this->monsters.push_back(new Dragon(70, 25, x, y)); break;
+	 	case 'P': this->princess = new Princess(1, 0, x, y); break; 
+	 	case 'Z': this->actors.push_back(new Zombie(4, 2, x, y)); break;
+	 	case 'D': this->actors.push_back(new Dragon(70, 25, x, y)); break;
 	 }
 	 this->map.addCharacter(c, x, y);
 }
 
+void GameManager::refreshGrid()
+{
+	this->map.printMap(this->game_win);
+	this->refreshInfo();
+}
+
+void GameManager::createGrids()
+{
+	this->game_win = newwin(30, 60, 0, 0);
+	this->info_win = newwin(30, 20, 0, 61);
+}
+
+void GameManager::deleteGrids()
+{
+	delwin(this->game_win);
+	delwin(this->info_win);
+}
+
+GameManager& GameManager::instance()
+{
+	static GameManager manager(dir);
+	return manager;
+}

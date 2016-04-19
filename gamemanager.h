@@ -8,7 +8,7 @@
 enum COLORS_UNITS 
 { 
 	WALL = 1, 
-	LEA = 2, 
+	GROUND = 2, 
 	KNIGHT = 3, 
 	PRINCESS = 4, 
 	ZOMBIE = 5, 
@@ -16,18 +16,28 @@ enum COLORS_UNITS
 	BASE = 7
 };
 
+#define KEY_DAMAGE ' '
+
 class GameManager
 {
 public:
+	WINDOW *game_win, *info_win;
 	Map map;
-	std::vector<Character*> heroes;
-	std::vector<Character*> monsters;
+	Knight *knight;
+	Princess *princess;
+	std::vector<Actor*> actors;
+	static GameManager& instance();
 	GameManager(const char *name_map);
+	void collide(Actor* left, Actor* right);
+	void createGrids();
+	void deleteGrids();
+	Actor* getActor(int x, int y);
 	int keyCallback(int key);
 	void unitsMove();
-	void selectStartPos(WINDOW *win);
-	void addUnit(char c, int x, int y);
+	void selectStartPos();
+	void addActor(char c, int x, int y);
 	void generateUnits();
+	void knightAttack();
 	void refreshGrid();
 	void refreshInfo();
 };

@@ -1,41 +1,38 @@
-#include <stdio.h>
-#include <iostream>
-#include <fstream>
-#include <typeinfo>
-#include "gamemanager.h"
-#include <stdlib.h>
 #include <ctime>
-
-
-const char *dir = "map.txt";
+#include <stdlib.h>
+#include "gamemanager.h"
 
 void initColorPairs();
 
 int main(int argc, char **argv)
 {
-	srand(time(0));
+	int x, y;
 	initscr();
-	curs_set(0);
 	noecho();
+	curs_set(FALSE);
 	cbreak();
-	keypad(stdscr, TRUE);
-	clear();
 	start_color();
 	initColorPairs();
-	WINDOW *win = newwin(30, 80, 0, 0);
- 	GameManager Manager(dir);
- 	mvprintw(0, 0, "%s", "Please, select you start position. After selected press SPACE");
- 	getch();
- 	Manager.selectStartPos(win);
- 	Manager.generateUnits();
- 	Manager.refreshGrid();
+	clear();
+	srand(time(0));
+	GameManager::instance().createGrids();
+	keypad(GameManager::instance().game_win, TRUE);
+ 	mvwprintw(GameManager::instance().game_win, 0, 1, "%s\n %s", 
+ 		"Please, select you start position.", 
+ 		"After selected press SPACE. Press any key now...");
+ 	wrefresh(GameManager::instance().game_win);
+ 	wgetch(GameManager::instance().game_win);
+ 	GameManager::instance().selectStartPos();
+ 	GameManager::instance().generateUnits();
+ 	GameManager::instance().refreshGrid();
 	while (1)
 	{
-		int command = getch();
-		if (Manager.keyCallback(command)) break;
-		Manager.unitsMove();
-		Manager.refreshGrid();
+		int command = wgetch(GameManager::instance().game_win);
+		if (GameManager::instance().keyCallback(command)) break;
+		GameManager::instance().unitsMove();
+		GameManager::instance().refreshGrid();
 	}
+	GameManager::instance().deleteGrids();
 	endwin();
 	return 0;
 }
@@ -43,12 +40,12 @@ int main(int argc, char **argv)
 void initColorPairs()
 {
 	init_pair(BASE, 7, 0);
-	init_pair(WALL, 0, 0);                    
-	init_pair(LEA, 7, 7);                     
-	init_pair(KNIGHT, 1, 7);                  
-	init_pair(PRINCESS, 7, 5);                
-	init_pair(ZOMBIE, 2, 7);                  
-	init_pair(DRAGON, 1, 0);                  
+	init_pair(WALL, 0, 0);
+	init_pair(GROUND, 7, 7);
+	init_pair(KNIGHT, 1, 7);
+	init_pair(PRINCESS, 7, 5);
+	init_pair(ZOMBIE, 2, 7);
+	init_pair(DRAGON, 1, 0);
 }
 /*
 		COLOR_BLACK   0
