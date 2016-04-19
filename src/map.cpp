@@ -19,8 +19,8 @@ Map::Map(const char* name_map)
 			input >> c;
 			switch(c)
 			{
-				case WALL_SYMBOL: row.push_back(new Wall(i, j)); break;
-				case GROUND_SYMBOL: row.push_back(new Ground(i, j, 1)); break;
+				case WALL_SYMBOL: row.push_back(new Wall(3, i, j)); break;
+				case GROUND_SYMBOL: row.push_back(new Ground(1, i, j)); break;
 			}
 		}
 		map.push_back(row);

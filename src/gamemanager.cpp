@@ -10,6 +10,7 @@ void initColorPairs();
 void GameManager::collide(Actor* left, Actor* right)
 {
 	left->collide(right);
+	if (left->is_die()) this->map.sd = true;
 }
 
 void GameManager::gameLoop()

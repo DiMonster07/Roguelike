@@ -18,19 +18,24 @@ void Actor::setCoordinates(int x, int y)
 	this->y = y;
 }
 
-int Character::get_hp()
+int Actor::get_hp()
 {
 	return this->health;
+}
+
+void Actor::set_hp(int value)
+{
+	this->health = value;
+}
+
+bool Actor::is_die()
+{
+	return this->get_hp() > 0 ? false : true;
 }
 
 int Character::get_damage()
 {
 	return this->damage;
-}
-
-void Character::set_hp(int value)
-{
-	this->health = value;
 }
 
 void Character::move(Map &m, int x, int y)
@@ -70,21 +75,6 @@ int Knight::get_color()
 	return KNIGHT_COLOR;
 };
 
-void Princess::collide(Actor* actor)
-{
-	actor->collide(this);
-};
-
-char Princess::get_symbol()
-{
-	return PRINCESS_SYMBOL;
-};
-
-int Princess::get_color()
-{
-	return PRINCESS_COLOR;
-};
-
 void Monster::collide(Actor* actor)
 {
 	actor->collide(this);
@@ -122,10 +112,25 @@ int Dragon::get_color()
 	return DRAGON_COLOR;
 };
 
-void Wall::collide(Actor* actor)
+void Environment::collide(Actor *actor)
 {
 	actor->collide(this);
-};
+}
+
+void Environment::collide(Knight* knight)
+{
+	this->set_hp(this->get_hp() - knight->get_damage());
+}
+
+void Environment::collide(Monster* monster)
+{
+	this->set_hp(this->get_hp() - monster->get_damage());
+}
+
+// void Wall::collide(Actor* actor)
+// {
+// 	actor->collide(this);
+// };
 
 char Wall::get_symbol()
 {
@@ -137,15 +142,15 @@ int Wall::get_color()
 	return WALL_COLOR;
 };
 
-void Ground::collide(Knight* knight)
-{
-	knight->set_hp(knight->get_hp() - 1);
-}
-
-void Ground::collide(Actor* actor)
-{
-	actor->collide(this);
-};
+// void Ground::collide(Knight* knight)
+// {
+// 	knight->set_hp(knight->get_hp() - 1);
+// }
+//
+// void Ground::collide(Actor* actor)
+// {
+// 	actor->collide(this);
+// };
 
 char Ground::get_symbol()
 {
@@ -155,4 +160,19 @@ char Ground::get_symbol()
 int Ground::get_color()
 {
 	return GROUND_COLOR;
+};
+
+void Princess::collide(Actor* actor)
+{
+	actor->collide(this);
+};
+
+char Princess::get_symbol()
+{
+	return PRINCESS_SYMBOL;
+};
+
+int Princess::get_color()
+{
+	return PRINCESS_COLOR;
 };

@@ -14,14 +14,17 @@
 class Actor
 {
 protected:
-	int x, y;
+	int x, y, health;
 public:
-	Actor () : x(0), y(0) {};
-	Actor (int x, int y) : x(x), y(y) {};
+	Actor () : x(0), y(0), health(0) {};
+	Actor (int h, int x, int y) : health(h), x(x), y(y) {};
 	virtual ~Actor() {};
 	int getX();
 	int getY();
 	void setCoordinates(int x, int y);
+	int get_hp();
+	void set_hp(int value);
+	bool is_die();
 	virtual char get_symbol() {};
 	virtual int get_color() {};
 	virtual void move(Map &m, int x, int y) = 0;
@@ -37,15 +40,13 @@ public:
 class Character: public Actor
 {
 protected:
-	int health, damage;
+	int damage;
 public:
-	Character () : health(0), damage(0), Actor (0, 0) {};
-	Character (int h, int d, int x, int y) : health(h), damage(d),
-		Actor (x, y) {};
+	Character () : damage(0), Actor (0, 0, 0) {};
+	Character (int h, int d, int x, int y) : damage(d),
+		Actor (h, x, y) {};
 	void move(Map &m, int x, int y);
-	int get_hp();
 	int get_damage();
-	void set_hp(int value);
 };
 
 class Knight: public Character
@@ -106,31 +107,29 @@ public:
 class Environment: public Actor
 {
 public:
-	Environment () : Actor(0, 0) {};
-	Environment (int i, int j) : Actor(i, j) {};
+	Environment () : Actor(0, 0, 0) {};
+	Environment (int h, int i, int j) : Actor(h, i, j) {};
 	void move(Map &m, int x, int y) {};
+	void collide(Actor* actor);
+	void collide(Knight* knight);
+	void collide(Monster* monster);
+	void collide(Environment* environment) {};
 };
 
 class Wall: public Environment
 {
 public:
-	Wall () : Environment(0, 0) {};
-	Wall (int i, int j) : Environment(i, j) {};
+	Wall () : Environment(0, 0, 0) {};
+	Wall (int h, int i, int j) : Environment(h, i, j) {};
 	char get_symbol();
 	int get_color();
-	void collide(Actor* actor);
 };
 
 class Ground: public Environment
 {
-private:
-	int health;
 public:
-	Ground () : health(0), Environment(0, 0) {};
-	Ground (int i, int j, int h) : health(h), Environment(i, j) {};
+	Ground () : Environment(0, 0, 0) {};
+	Ground (int h, int i, int j) : Environment(h, i, j) {};
 	char get_symbol();
 	int get_color();
-	void collide(Actor* actor);
-	void collide(Knight* knight);
-	void collide(Ground* ground) {};
 };
