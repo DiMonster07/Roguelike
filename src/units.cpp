@@ -82,7 +82,7 @@ void Monster::collide(Actor* actor)
 
 void Monster::collide(Knight* knight)
 {
-	knight->set_hp(knight->get_hp() - this->get_damage());
+	this->set_hp(this->get_hp() - knight->get_damage());
 };
 
 void Monster::collide(Princess *princess)

@@ -16,7 +16,6 @@ void GameManager::collide(Actor* left, Actor* right)
 		int yl = left->getY();
 		int xr = right->getX();
 		int yr = right->getY();
-		right->set_hp(1);
 		delete right;
 		this->map.map[xr][yr] = left;
 		this->map.map[xr][yr]->setCoordinates(xr, yr);
@@ -91,24 +90,25 @@ void GameManager::generateUnits()
 	int y = this->knight->getY();
 	while (1)
 	{
-		int xn = rand() % (this->map.cols - 2) + 1;
-		int yn = rand() % (this->map.rows - 2) + 1;
-		if ((abs(x - xn) >= this->map.cols / 2 - 1) &&
-			(abs(y - yn) >= this->map.rows / 2 - 1) &&
-			(this->map.map[yn][xn].get_symbol() == '.'))
+		int xn = rand() % (this->map.rows - 2) + 1;
+		int yn = rand() % (this->map.cols - 2) + 1;
+		if ((abs(x - xn) >= this->map.rows / 2 - 1) &&
+			(abs(y - yn) >= this->map.cols / 2 - 1) &&
+			(this->map.map[xn][yn]->get_symbol() == '.'))
 		{
 			x = xn;
 			y = yn;
 			break;
 		}
 	}
-	this->addActor('P', x, y);
+	this->princess = new Princess(1, 0, x, y);
+	this->map.addActor(this->princess);
 	int i = 0;
 	while(i < 30)
 	{
-		x = rand() % (this->map.cols - 1) + 1;
-		y = rand() % (this->map.rows - 1) + 1;
-		if (this->map.map[y][x].get_symbol() == '.')
+		x = rand() % (this->map.rows - 1) + 1;
+		y = rand() % (this->map.cols - 1) + 1;
+		if (this->map.map[x][y]->get_symbol() == '.')
 		{
 			this->addActor('Z', x, y);
 			i++;
@@ -142,8 +142,8 @@ void GameManager::refreshInfo()
 	mvwprintw(this->info_win, 0, 0, "%s", "INFO");
 	mvwprintw(this->info_win, 1, 0, "Health: %d", this->knight->get_hp());
 	mvwprintw(this->info_win, 2, 0, "Damage: %d", this->knight->get_damage());
-	mvwprintw(this->info_win, 3, 0, "Сoordinate: %d %d", this->knight->getX(),
-		this->knight->getY());
+	mvwprintw(this->info_win, 3, 0, "Сoordinate: %d %d", this->knight->getY(),
+		this->knight->getX());
 	if (this->map.sd) mvwprintw(this->info_win, 4, 0, "Collide!!!");
 	wrefresh(this->info_win);
 }
@@ -175,11 +175,10 @@ void GameManager::addActor(char c, int x, int y)
 {
 	 switch(c)
 	 {
-	 	case 'P': this->princess = new Princess(1, 0, x, y); break;
 	 	case 'Z': this->actors.push_back(new Zombie(4, 2, x, y)); break;
 	 	case 'D': this->actors.push_back(new Dragon(70, 25, x, y)); break;
 	 }
-	 this->map.addCharacter(c, x, y);
+	 this->map.addActor(this->actors[this->actors.size() - 1]);
 }
 
 void GameManager::refreshGrid()

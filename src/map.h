@@ -21,6 +21,6 @@ public:
 	std::vector< std::vector<Actor*> > map;
 	Map() {};
 	Map(const char *name_map);
-	void addCharacter(char ch, int x, int y);
+	void addActor(Actor *actor);
 	void printMap(WINDOW *win);
 };

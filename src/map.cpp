@@ -27,9 +27,10 @@ Map::Map(const char* name_map)
 	}
 }
 
-void Map::addCharacter(char ch, int x, int y)
+void Map::addActor(Actor *actor)
 {
-	//this->map[y][x] = ch;
+	delete this->map[actor->getX()][actor->getY()];
+	this->map[actor->getX()][actor->getY()] = actor;
 }
 
 void Map::printMap(WINDOW *win)
