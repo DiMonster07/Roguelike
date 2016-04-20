@@ -10,7 +10,18 @@ void initColorPairs();
 void GameManager::collide(Actor* left, Actor* right)
 {
 	left->collide(right);
-	if (left->is_die()) this->map.sd = true;
+	if (right->is_die())
+	{
+		int xl = left->getX();
+		int yl = left->getY();
+		int xr = right->getX();
+		int yr = right->getY();
+		right->set_hp(1);
+		delete right;
+		this->map.map[xr][yr] = left;
+		this->map.map[xr][yr]->setCoordinates(xr, yr);
+		this->map.map[xl][yl] = new Ground(1, xl, yl);
+	}
 }
 
 void GameManager::gameLoop()
@@ -22,7 +33,7 @@ void GameManager::gameLoop()
 	{
 		int command = wgetch(this->game_win);
 		if (this->keyCallback(command)) break;
-		this->unitsMove();
+		//this->unitsMove();
 		this->refreshGrid();
 	}
 }
@@ -48,8 +59,8 @@ void GameManager::unitsMove()
 		this->actors[i]->move(this->map, x_m, y_m);
 		x_m = this->actors[i]->getX();
 		y_m = this->actors[i]->getY();
-		if (abs(x_m - x_k) <= 1 && abs(y_m - y_k) <= 1)
-			this->collide(this->knight, this->actors[i]);
+		//if (abs(x_m - x_k) <= 1 && abs(y_m - y_k) <= 1)
+		//	this->collide(this->knight, this->actors[i]);
 	}
 }
 
@@ -76,33 +87,33 @@ void GameManager::knightAttack()
 
 void GameManager::generateUnits()
 {
-	// int x = this->knight->getX();
-	// int y = this->knight->getY();
-	// while (1)
-	// {
-	// 	int xn = rand() % (this->map.cols - 2) + 1;
-	// 	int yn = rand() % (this->map.rows - 2) + 1;
-	// 	if ((abs(x - xn) >= this->map.cols / 2 - 1) &&
-	// 		(abs(y - yn) >= this->map.rows / 2 - 1) &&
-	// 		(this->map.map[yn][xn].get_symbol() == '.'))
-	// 	{
-	// 		x = xn;
-	// 		y = yn;
-	// 		break;
-	// 	}
-	// }
-	// this->addActor('P', x, y);
-	// int i = 0;
-	// while(i < 30)
-	// {
-	// 	x = rand() % (this->map.cols - 1) + 1;
-	// 	y = rand() % (this->map.rows - 1) + 1;
-	// 	if (this->map.map[y][x].get_symbol() == '.')
-	// 	{
-	// 		this->addActor('Z', x, y);
-	// 		i++;
-	// 	}
-	// }
+	int x = this->knight->getX();
+	int y = this->knight->getY();
+	while (1)
+	{
+		int xn = rand() % (this->map.cols - 2) + 1;
+		int yn = rand() % (this->map.rows - 2) + 1;
+		if ((abs(x - xn) >= this->map.cols / 2 - 1) &&
+			(abs(y - yn) >= this->map.rows / 2 - 1) &&
+			(this->map.map[yn][xn].get_symbol() == '.'))
+		{
+			x = xn;
+			y = yn;
+			break;
+		}
+	}
+	this->addActor('P', x, y);
+	int i = 0;
+	while(i < 30)
+	{
+		x = rand() % (this->map.cols - 1) + 1;
+		y = rand() % (this->map.rows - 1) + 1;
+		if (this->map.map[y][x].get_symbol() == '.')
+		{
+			this->addActor('Z', x, y);
+			i++;
+		}
+	}
 }
 
 int GameManager::keyCallback(int key)
@@ -111,13 +122,13 @@ int GameManager::keyCallback(int key)
 	int y = this->knight->getY();
 	switch(key)
 	{
-		case KEY_UP: this->collide(this->knight, this->map.map[y - 1][x]);
+		case KEY_UP: this->collide(this->knight, this->map.map[x - 1][y]);
 			break;
-		case KEY_DOWN: this->collide(this->knight, this->map.map[y + 1][x]);
+		case KEY_DOWN: this->collide(this->knight, this->map.map[x + 1][y]);
 			break;
-		case KEY_RIGHT: this->collide(this->knight, this->map.map[y][x + 1]);
+		case KEY_RIGHT: this->collide(this->knight, this->map.map[x][y + 1]);
 			break;
-		case KEY_LEFT: this->collide(this->knight, this->map.map[y][x - 1]);
+		case KEY_LEFT: this->collide(this->knight, this->map.map[x][y - 1]);
 			break;
 		//case KEY_DAMAGE: this->knightAttack(); break;
 		case 27: return 1;

@@ -112,25 +112,20 @@ int Dragon::get_color()
 	return DRAGON_COLOR;
 };
 
-void Environment::collide(Actor *actor)
+void Ground::collide(Actor *actor)
 {
 	actor->collide(this);
 }
 
-void Environment::collide(Knight* knight)
+void Ground::collide(Knight* knight)
 {
 	this->set_hp(this->get_hp() - knight->get_damage());
 }
 
-void Environment::collide(Monster* monster)
+void Ground::collide(Monster* monster)
 {
 	this->set_hp(this->get_hp() - monster->get_damage());
 }
-
-// void Wall::collide(Actor* actor)
-// {
-// 	actor->collide(this);
-// };
 
 char Wall::get_symbol()
 {
@@ -141,16 +136,6 @@ int Wall::get_color()
 {
 	return WALL_COLOR;
 };
-
-// void Ground::collide(Knight* knight)
-// {
-// 	knight->set_hp(knight->get_hp() - 1);
-// }
-//
-// void Ground::collide(Actor* actor)
-// {
-// 	actor->collide(this);
-// };
 
 char Ground::get_symbol()
 {
