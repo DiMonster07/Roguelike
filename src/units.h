@@ -59,7 +59,6 @@ public:
 	void collide(Actor* actor);
 	void collide(Knight* knight) {};
 	void collide(Monster *monster);
-	void collide(Princess* princess);
 	void collide(Ground* ground);
 };
 
@@ -71,7 +70,7 @@ public:
 	char get_symbol();
 	int get_color();
 	void collide(Actor* actor);
-	void collide(Knight* knight) {};
+	void collide(Knight* knight);
 	void collide(Princess* princess) {};
 };
 

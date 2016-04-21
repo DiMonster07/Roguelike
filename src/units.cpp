@@ -50,14 +50,7 @@ void Knight::collide(Actor* actor)
 
 void Knight::collide(Monster *monster)
 {
-	monster->set_hp(monster->get_hp() - this->get_damage());
-};
-
-void Knight::collide(Princess *princess)
-{
-	mvprintw(1, 1, "YOU WIN!");
-	sleep(1);
-	exit(0);
+	this->set_hp(this->get_hp() - monster->get_damage());
 };
 
 void Knight::collide(Ground *ground)
@@ -150,6 +143,13 @@ int Ground::get_color()
 void Princess::collide(Actor* actor)
 {
 	actor->collide(this);
+};
+
+void Princess::collide(Knight* knight)
+{
+	mvprintw(1, 1, "YOU WIN!");
+	sleep(1);
+	exit(0);
 };
 
 char Princess::get_symbol()

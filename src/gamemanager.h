@@ -38,6 +38,7 @@ public:
 	void selectStartPos();
 	void unitsMove();
 	void addActor(char c, int x, int y);
+	void deleteActor(Actor *actor);
 	void generateUnits();
 	void knightAttack();
 	void gameLoop();

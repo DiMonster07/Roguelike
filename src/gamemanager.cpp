@@ -16,11 +16,24 @@ void GameManager::collide(Actor* left, Actor* right)
 		int yl = left->getY();
 		int xr = right->getX();
 		int yr = right->getY();
-		delete right;
+		this->deleteActor(right);
 		this->map.map[xr][yr] = left;
 		this->map.map[xr][yr]->setCoordinates(xr, yr);
 		this->map.map[xl][yl] = new Ground(1, xl, yl);
 	}
+}
+
+void GameManager::deleteActor(Actor *actor)
+{
+	for (int i = 0; i < this->actors.size(); i++)
+	{
+		if (this->actors[i] == actor)
+		{
+			this->actors.erase(this->actors.begin() + i);
+			break;
+		}
+	}
+	delete actor;
 }
 
 void GameManager::gameLoop()
@@ -144,7 +157,7 @@ void GameManager::refreshInfo()
 	mvwprintw(this->info_win, 2, 0, "Damage: %d", this->knight->get_damage());
 	mvwprintw(this->info_win, 3, 0, "Сoordinate: %d %d", this->knight->getY(),
 		this->knight->getX());
-	if (this->map.sd) mvwprintw(this->info_win, 4, 0, "Collide!!!");
+	//mvwprintw(this->info_win, 4, 0, "Vector size: %d", this->actors.size());
 	wrefresh(this->info_win);
 }
 
