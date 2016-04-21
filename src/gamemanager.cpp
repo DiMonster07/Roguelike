@@ -45,7 +45,7 @@ void GameManager::gameLoop()
 	{
 		int command = wgetch(this->game_win);
 		if (this->keyCallback(command)) break;
-		//this->unitsMove();
+		this->unitsMove();
 		this->refreshGrid();
 	}
 }
@@ -56,21 +56,25 @@ void GameManager::unitsMove()
 	int y_k = this->knight->getY();
 	for (int i = 0; i < this->actors.size(); i++)
 	{
-		int x_m = this->actors[i]->getX();
-		int y_m = this->actors[i]->getY();
-		if ((abs(x_m - x_k) <= vis_range) && (abs(y_m - y_k) <= vis_range))
+		int offset_x = this->actors[i]->getX();
+		int offset_y = this->actors[i]->getY();
+		if ((abs(offset_x - x_k) <= vis_range) &&
+			(abs(offset_y - y_k) <= vis_range))
 		{
-			x_m = (x_k - x_m) < 0 ? -1 : 1;
-			y_m = (y_k - y_m) < 0 ? -1 : 1;
+			offset_x = (x_k - offset_x) < 0 ? -1 : 1;
+			offset_y = (y_k - offset_y) < 0 ? -1 : 1;
 		}
 		else
 		{
-			x_m = rand() % 3 - 1;
-			y_m = rand() % 3 - 1;
+			offset_x = rand() % 3 - 1;
+			offset_y = rand() % 3 - 1;
 		}
-		this->actors[i]->move(this->map, x_m, y_m);
-		x_m = this->actors[i]->getX();
-		y_m = this->actors[i]->getY();
+		int x = this->actors[i]->getX();
+		int y = this->actors[i]->getY();
+		this->collide(this->actors[i],
+			this->map.map[x + offset_x][y + offset_y]);
+		// x_m = this->actors[i]->getX();
+		// y_m = this->actors[i]->getY();
 		//if (abs(x_m - x_k) <= 1 && abs(y_m - y_k) <= 1)
 		//	this->collide(this->knight, this->actors[i]);
 	}
