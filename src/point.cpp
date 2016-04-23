@@ -43,5 +43,5 @@ bool Point::operator==(const Point &p)
 
 bool Point::operator!=(const Point &p)
 {
-    return (this->x == p.x) || (this->y == p.y);
+    return (this->x != p.x) || (this->y != p.y);
 }
