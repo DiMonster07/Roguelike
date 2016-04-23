@@ -23,19 +23,6 @@ void GameManager::collide(Actor* left, Actor* right)
 	}
 }
 
-void GameManager::deleteActor(Actor *actor)
-{
-	for (int i = 0; i < this->actors.size(); i++)
-	{
-		if (this->actors[i] == actor)
-		{
-			this->actors.erase(this->actors.begin() + i);
-			break;
-		}
-	}
-	delete actor;
-}
-
 void GameManager::gameLoop()
 {
 	this->selectStartPos();
@@ -73,10 +60,6 @@ void GameManager::unitsMove()
 		int y = this->actors[i]->getY();
 		this->collide(this->actors[i],
 			this->map.map[x + offset_x][y + offset_y]);
-		// x_m = this->actors[i]->getX();
-		// y_m = this->actors[i]->getY();
-		//if (abs(x_m - x_k) <= 1 && abs(y_m - y_k) <= 1)
-		//	this->collide(this->knight, this->actors[i]);
 	}
 }
 
@@ -196,6 +179,19 @@ void GameManager::addActor(char c, int x, int y)
 	 	case 'D': this->actors.push_back(new Dragon(70, 25, x, y)); break;
 	 }
 	 this->map.addActor(this->actors[this->actors.size() - 1]);
+}
+
+void GameManager::deleteActor(Actor *actor)
+{
+	for (int i = 0; i < this->actors.size(); i++)
+	{
+		if (this->actors[i] == actor)
+		{
+			this->actors.erase(this->actors.begin() + i);
+			break;
+		}
+	}
+	delete actor;
 }
 
 void GameManager::refreshGrid()

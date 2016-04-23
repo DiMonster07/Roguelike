@@ -40,7 +40,7 @@ int Character::get_damage()
 
 void Character::move(Map &m, int x, int y)
 {
-	this->collide(m.map[this->getY() + y][this->getX() + x]);
+	//this->collide(m.map[this->getY() + y][this->getX() + x]);
 }
 
 void Knight::collide(Actor* actor)

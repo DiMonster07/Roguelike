@@ -7,7 +7,8 @@ set(SOURCE_FILES
     ../src/main.cpp
     ../src/gamemanager.cpp
     ../src/map.cpp
-    ../src/units.cpp)
+    ../src/units.cpp
+    ../src/point.cpp)
 
 add_executable(Roguelike ${SOURCE_FILES})
 target_link_libraries( Roguelike ncurses panel )
