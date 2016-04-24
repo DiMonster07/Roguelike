@@ -1,5 +1,6 @@
 #pragma once
 #include "map.h"
+#include "point.h"
 #include <ncurses.h>
 #include <panel.h>
 #include <vector>
@@ -14,20 +15,21 @@
 class Actor
 {
 protected:
-	int x, y, health;
+	int health;
+	Point point;
 public:
-	Actor () : health(0), x(0), y(0) {};
-	Actor (int h, int x, int y) : health(h), x(x), y(y) {};
+	Actor () : health(0) { point.x = point.y = 0; };
+	Actor (int h, int x, int y) : health(h) { point.x = x; point.y = y; };
 	virtual ~Actor() {};
-	int getX();
-	int getY();
-	void setCoordinates(int x, int y);
+	Point get_point();
+	void set_point(int x, int y);
+	void set_point(Point p);
 	int get_hp();
 	void set_hp(int value);
 	bool is_die();
 	virtual char get_symbol() {};
 	virtual int get_color() {};
-	virtual void move(Map &m, int x, int y) = 0;
+	virtual void move(Map &m, Point p) = 0;
 	virtual void collide(Actor* actor) = 0;
     virtual void collide(Character* character) {};
     virtual void collide(Knight* knight) {};
@@ -43,9 +45,8 @@ protected:
 	int damage;
 public:
 	Character () : damage(0), Actor (0, 0, 0) {};
-	Character (int h, int d, int x, int y) : damage(d),
-		Actor (h, x, y) {};
-	void move(Map &m, int x, int y);
+	Character (int h, int d, int x, int y) : damage(d), Actor (h, x, y) {};
+	void move(Map &m, Point p);
 	int get_damage();
 };
 
@@ -108,7 +109,7 @@ class Environment: public Actor
 public:
 	Environment () : Actor(0, 0, 0) {};
 	Environment (int h, int x, int y) : Actor(h, x, y) {};
-	void move(Map &m, int x, int y) {};
+	void move(Map &m, Point p) {};
 };
 
 class Wall: public Environment

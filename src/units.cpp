@@ -2,20 +2,20 @@
 #include "gamemanager.h"
 #include <unistd.h>
 
-int Actor::getX()
+Point Actor::get_point()
 {
-	return this->x;
+	return this->point;
 }
 
-int Actor::getY()
+void Actor::set_point(int x, int y)
 {
-	return this->y;
+	this->point.x = x;
+	this->point.y = y;
 }
 
-void Actor::setCoordinates(int x, int y)
+void Actor::set_point(Point p)
 {
-	this->x = x;
-	this->y = y;
+	this->point = p;
 }
 
 int Actor::get_hp()
@@ -38,7 +38,7 @@ int Character::get_damage()
 	return this->damage;
 }
 
-void Character::move(Map &m, int x, int y)
+void Character::move(Map &m, Point p)
 {
 	//this->collide(m.map[this->getY() + y][this->getX() + x]);
 }

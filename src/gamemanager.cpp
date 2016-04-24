@@ -12,14 +12,12 @@ void GameManager::collide(Actor* left, Actor* right)
 	left->collide(right);
 	if (right->is_die())
 	{
-		int xl = left->getX();
-		int yl = left->getY();
-		int xr = right->getX();
-		int yr = right->getY();
+		Point pl = left->get_point();
+		Point pr = right->get_point();
 		this->deleteActor(right);
-		this->map.map[xr][yr] = left;
-		this->map.map[xr][yr]->setCoordinates(xr, yr);
-		this->map.map[xl][yl] = new Ground(1, xl, yl);
+		this->map.map[pr.x][pr.y] = left;
+		this->map.map[pr.x][pr.y]->set_point(pr);
+		this->map.map[pl.x][pl.y] = new Ground(1, pl.x, pl.y);
 	}
 }
 
@@ -39,27 +37,24 @@ void GameManager::gameLoop()
 
 void GameManager::unitsMove()
 {
-	int x_k = this->knight->getX();
-	int y_k = this->knight->getY();
+	Point p_knight = this->knight->get_point();
 	for (int i = 0; i < this->actors.size(); i++)
 	{
-		int offset_x = this->actors[i]->getX();
-		int offset_y = this->actors[i]->getY();
-		if ((abs(offset_x - x_k) <= vis_range) &&
-			(abs(offset_y - y_k) <= vis_range))
+		Point offset = this->actors[i]->get_point();
+		if ((abs(offset.x - p_knight.x) <= vis_range) &&
+			(abs(offset.y - p_knight.y) <= vis_range))
 		{
-			offset_x = (x_k - offset_x) < 0 ? -1 : 1;
-			offset_y = (y_k - offset_y) < 0 ? -1 : 1;
+			offset.x = (p_knight.x - offset.x) < 0 ? -1 : 1;
+			offset.y = (p_knight.y - offset.y) < 0 ? -1 : 1;
 		}
 		else
 		{
-			offset_x = rand() % 3 - 1;
-			offset_y = rand() % 3 - 1;
+			offset.x = rand() % 3 - 1;
+			offset.y = rand() % 3 - 1;
 		}
-		int x = this->actors[i]->getX();
-		int y = this->actors[i]->getY();
+		Point p_act = this->actors[i]->get_point();
 		this->collide(this->actors[i],
-			this->map.map[x + offset_x][y + offset_y]);
+			this->map.map[p_act.x + offset.x][p_act.y + offset.y]);
 	}
 }
 
@@ -86,31 +81,30 @@ void GameManager::knightAttack()
 
 void GameManager::generateUnits()
 {
-	int x = this->knight->getX();
-	int y = this->knight->getY();
+	Point pnt = this->knight->get_point();
 	while (1)
 	{
 		int xn = rand() % (this->map.rows - 2) + 1;
 		int yn = rand() % (this->map.cols - 2) + 1;
-		if ((abs(x - xn) >= this->map.rows / 2 - 1) &&
-			(abs(y - yn) >= this->map.cols / 2 - 1) &&
+		if ((abs(pnt.x - xn) >= this->map.rows / 2 - 1) &&
+			(abs(pnt.y - yn) >= this->map.cols / 2 - 1) &&
 			(this->map.map[xn][yn]->get_symbol() == '.'))
 		{
-			x = xn;
-			y = yn;
+			pnt.x = xn;
+			pnt.y = yn;
 			break;
 		}
 	}
-	this->princess = new Princess(1, 0, x, y);
+	this->princess = new Princess(1, 0, pnt.x, pnt.y);
 	this->map.addActor(this->princess);
 	int i = 0;
 	while(i < 30)
 	{
-		x = rand() % (this->map.rows - 1) + 1;
-		y = rand() % (this->map.cols - 1) + 1;
-		if (this->map.map[x][y]->get_symbol() == '.')
+		pnt.x = rand() % (this->map.rows - 1) + 1;
+		pnt.y = rand() % (this->map.cols - 1) + 1;
+		if (this->map.map[pnt.x][pnt.y]->get_symbol() == '.')
 		{
-			this->addActor('Z', x, y);
+			this->addActor('Z', pnt.x, pnt.y);
 			i++;
 		}
 	}
@@ -118,17 +112,20 @@ void GameManager::generateUnits()
 
 int GameManager::keyCallback(int key)
 {
-	int x = this->knight->getX();
-	int y = this->knight->getY();
+	Point pnt = this->knight->get_point();
 	switch(key)
 	{
-		case KEY_UP: this->collide(this->knight, this->map.map[x - 1][y]);
+		case KEY_UP:
+			this->collide(this->knight, this->map.map[pnt.x - 1][pnt.y]);
 			break;
-		case KEY_DOWN: this->collide(this->knight, this->map.map[x + 1][y]);
+		case KEY_DOWN:
+			this->collide(this->knight, this->map.map[pnt.x + 1][pnt.y]);
 			break;
-		case KEY_RIGHT: this->collide(this->knight, this->map.map[x][y + 1]);
+		case KEY_RIGHT:
+			this->collide(this->knight, this->map.map[pnt.x][pnt.y + 1]);
 			break;
-		case KEY_LEFT: this->collide(this->knight, this->map.map[x][y - 1]);
+		case KEY_LEFT:
+			this->collide(this->knight, this->map.map[pnt.x][pnt.y - 1]);
 			break;
 		//case KEY_DAMAGE: this->knightAttack(); break;
 		case 27: return 1;
@@ -142,8 +139,8 @@ void GameManager::refreshInfo()
 	mvwprintw(this->info_win, 0, 0, "%s", "INFO");
 	mvwprintw(this->info_win, 1, 0, "Health: %d", this->knight->get_hp());
 	mvwprintw(this->info_win, 2, 0, "Damage: %d", this->knight->get_damage());
-	mvwprintw(this->info_win, 3, 0, "Сoordinate: %d %d", this->knight->getY(),
-		this->knight->getX());
+	Point pnt = this->knight->get_point();
+	mvwprintw(this->info_win, 3, 0, "Сoordinate: %d %d", pnt.y, pnt.x);
 	//mvwprintw(this->info_win, 4, 0, "Vector size: %d", this->actors.size());
 	wrefresh(this->info_win);
 }

@@ -29,8 +29,9 @@ Map::Map(const char* name_map)
 
 void Map::addActor(Actor *actor)
 {
-	delete this->map[actor->getX()][actor->getY()];
-	this->map[actor->getX()][actor->getY()] = actor;
+	Point p = actor->get_point();
+	delete this->map[p.x][p.y];
+	this->map[p.x][p.y] = actor;
 }
 
 void Map::printMap(WINDOW *win)
