@@ -23,7 +23,7 @@ public:
 	void refreshInfo();
 	int keyCallback(int key);
 	void selectStartPos();
-	Point findFreePlace();
+	Point findFreePlace(Point lp, Point rp);
 	void unitsMove();
 	void addActor(char c, int x, int y);
 	void deleteActor(Actor *actor);

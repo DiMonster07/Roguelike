@@ -7,16 +7,16 @@ const char *dir = "../src/map.txt";
 
 void initColorPairs();
 
-Point GameManager::findFreePlace()
+Point GameManager::findFreePlace(Point lp, Point rp)
 {
 	int c = 0;
-	for (int i = 0; i < this->map.rows; i++)
-		for (int j = 0; j < this->map.cols; j++)
+	for (int i = lp.x; i <= rp.x; i++)
+		for (int j = lp.y; j <= rp.y; j++)
 			if (this->map.map[i][j]->get_symbol() == GROUND_SYMBOL) c++;
 	int num = rand() % c + 1;
 	c = 0;
-	for (int i = 0; i < this->map.rows; i++)
-		for (int j = 0; j < this->map.cols; j++)
+	for (int i = lp.x; i <= rp.x; i++)
+		for (int j = lp.y; j <= rp.y; j++)
 		{
 			if (this->map.map[i][j]->get_symbol() == GROUND_SYMBOL) c++;
 			if (c == num) return this->map.map[i][j]->get_point();
@@ -115,7 +115,7 @@ void GameManager::generateUnits()
 	this->map.addActor(this->princess);
 	for (int i = 0; i < 30; i++)
 	{
-		Point pnt = this->findFreePlace();
+		Point pnt = this->findFreePlace(Point(1, 1), Point(29, 59));
 		this->addActor('Z', pnt.x, pnt.y);
 	}
 }
