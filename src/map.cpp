@@ -1,6 +1,7 @@
 #include "map.h"
 #include "gamemanager.h"
 #include "units.h"
+#include "spawners.h"
 #include <malloc.h>
 #include <fstream>
 #include <iostream>
@@ -21,6 +22,10 @@ Map::Map(const char* name_map)
 			{
 				case WALL_SYMBOL: row.push_back(new Wall(3, i, j)); break;
 				case GROUND_SYMBOL: row.push_back(new Ground(1, i, j)); break;
+				case DRAGONS_SPAWN_SYMBOL:
+					row.push_back(new SpawnDragons(60, i, j, 15)); break;
+				case ZOMBIES_SPAWN_SYMBOL:
+					row.push_back(new SpawnZombies(30, i, j, 5)); break;
 			}
 		}
 		map.push_back(row);

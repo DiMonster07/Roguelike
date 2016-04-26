@@ -1,5 +1,4 @@
 #include "units.h"
-#include "gamemanager.h"
 #include <unistd.h>
 
 Point Actor::get_point()
@@ -36,11 +35,6 @@ bool Actor::is_die()
 int Character::get_damage()
 {
 	return this->damage;
-}
-
-void Character::move(Map &m, Point p)
-{
-	//this->collide(m.map[this->getY() + y][this->getX() + x]);
 }
 
 void Knight::collide(Actor* actor)
@@ -149,7 +143,7 @@ void Princess::collide(Knight* knight)
 {
 	mvprintw(1, 1, "YOU WIN!");
 	sleep(1);
-	exit(0);
+	//exit(0);
 };
 
 char Princess::get_symbol()
@@ -160,4 +154,54 @@ char Princess::get_symbol()
 int Princess::get_color()
 {
 	return PRINCESS_COLOR;
+};
+
+char SpawnZombies::get_symbol()
+{
+    return ZOMBIES_SPAWN_SYMBOL;
+}
+
+int SpawnZombies::get_color()
+{
+    return ZOMBIES_SPAWN_COLOR;
+}
+
+char SpawnDragons::get_symbol()
+{
+    return DRAGONS_SPAWN_SYMBOL;
+}
+
+int SpawnDragons::get_color()
+{
+    return DRAGONS_SPAWN_COLOR;
+}
+
+void SpawnDragons::collide(Actor* actor)
+{
+	actor->collide(this);
+};
+
+void SpawnDragons::collide(Knight* knight)
+{
+	this->set_hp(this->get_hp() - knight->get_damage());
+};
+
+void SpawnDragons::collide(Monster *monster)
+{
+	this->set_hp(this->get_hp() - monster->get_damage());
+};
+
+void SpawnZombies::collide(Actor* actor)
+{
+	actor->collide(this);
+};
+
+void SpawnZombies::collide(Knight* knight)
+{
+	this->set_hp(this->get_hp() - knight->get_damage());
+};
+
+void SpawnZombies::collide(Monster *monster)
+{
+	this->set_hp(this->get_hp() - monster->get_damage());
 };

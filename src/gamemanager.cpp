@@ -241,6 +241,8 @@ void initColorPairs()
 	init_pair(PRINCESS_COLOR, 7, 5);
 	init_pair(ZOMBIE_COLOR, 2, 7);
 	init_pair(DRAGON_COLOR, 1, 0);
+	init_pair(ZOMBIES_SPAWN_COLOR, 0, 2);
+	init_pair(DRAGONS_SPAWN_COLOR, 0, 1);
 	init_pair(BASE_COLOR, 7, 0);
 }
 /*

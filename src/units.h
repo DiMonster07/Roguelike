@@ -1,9 +1,9 @@
 #pragma once
-#include "map.h"
-#include "point.h"
 #include <ncurses.h>
 #include <panel.h>
 #include <vector>
+#include <iostream>
+#include "point.h"
 
 #define GROUND_SYMBOL '.'
 #define WALL_SYMBOL '#'
@@ -11,6 +11,33 @@
 #define PRINCESS_SYMBOL 'P'
 #define ZOMBIE_SYMBOL 'Z'
 #define DRAGON_SYMBOL 'D'
+#define DRAGONS_SPAWN_SYMBOL '@'
+#define ZOMBIES_SPAWN_SYMBOL '%'
+
+class Actor;
+class Character;
+class Knight;
+class Princess;
+class Monster;
+class Environment;
+class Wall;
+class Ground;
+class Spawn;
+class SpawnDragons;
+class SpawnZombies;
+
+enum COLORS_UNITS
+{
+	WALL_COLOR = 1,
+	GROUND_COLOR = 2,
+	KNIGHT_COLOR = 3,
+	PRINCESS_COLOR = 4,
+	ZOMBIE_COLOR = 5,
+	DRAGON_COLOR = 6,
+	ZOMBIES_SPAWN_COLOR = 7,
+	DRAGONS_SPAWN_COLOR = 8,
+	BASE_COLOR = 9
+};
 
 class Actor
 {
@@ -29,12 +56,13 @@ public:
 	bool is_die();
 	virtual char get_symbol() {};
 	virtual int get_color() {};
-	virtual void move(Map &m, Point p) = 0;
 	virtual void collide(Actor* actor) = 0;
     virtual void collide(Character* character) {};
     virtual void collide(Knight* knight) {};
     virtual void collide(Princess* princess) {};
     virtual void collide(Monster* monster) {};
+	virtual void collide(SpawnZombies* spawnZombies) {};
+	virtual void collide(SpawnDragons* spawnDragons) {};
 	virtual void collide(Ground* ground) {};
 	virtual void collide(Wall* wall) {};
 };
@@ -46,7 +74,6 @@ protected:
 public:
 	Character () : damage(0), Actor (0, 0, 0) {};
 	Character (int h, int d, int x, int y) : damage(d), Actor (h, x, y) {};
-	void move(Map &m, Point p);
 	int get_damage();
 };
 
@@ -109,7 +136,6 @@ class Environment: public Actor
 public:
 	Environment () : Actor(0, 0, 0) {};
 	Environment (int h, int x, int y) : Actor(h, x, y) {};
-	void move(Map &m, Point p) {};
 };
 
 class Wall: public Environment
@@ -135,4 +161,37 @@ public:
 	void collide(Knight* knight);
 	void collide(Monster* monster);
 	void collide(Environment* environment) {};
+};
+
+class Spawn: public Actor
+{
+protected:
+    int timer;
+public:
+    Spawn () : Actor(0, 0, 0) {};
+    Spawn (int h, int x, int y, int t) : timer(t), Actor(h, x, y) {};
+};
+
+class SpawnZombies: public Spawn
+{
+public:
+    SpawnZombies () : Spawn(0, 0, 0, 0) {};
+    SpawnZombies (int h, int x, int y, int t) : Spawn(h, x, y, t) {};
+    char get_symbol();
+	int get_color();
+    void collide(Actor* actor);
+	void collide(Knight* knight);
+	void collide(Monster *monster);
+};
+
+class SpawnDragons: public Spawn
+{
+public:
+    SpawnDragons () : Spawn(0, 0, 0, 0) {};
+    SpawnDragons (int h, int x, int y, int t) : Spawn(h, x, y, t) {};
+    char get_symbol();
+	int get_color();
+    void collide(Actor* actor);
+	void collide(Knight* knight);
+	void collide(Monster *monster);
 };

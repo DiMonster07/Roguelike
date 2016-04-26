@@ -3,15 +3,7 @@
 #include <panel.h>
 #include <iostream>
 #include <vector>
-
-class Actor;
-class Character;
-class Knight;
-class Princess;
-class Monster;
-class Environment;
-class Wall;
-class Ground;
+#include "units.h"
 
 class Map
 {
