@@ -7,6 +7,22 @@ const char *dir = "../src/map.txt";
 
 void initColorPairs();
 
+Point GameManager::findFreePlace()
+{
+	int c = 0;
+	for (int i = 0; i < this->map.rows; i++)
+		for (int j = 0; j < this->map.cols; j++)
+			if (this->map.map[i][j]->get_symbol() == GROUND_SYMBOL) c++;
+	int num = rand() % c + 1;
+	c = 0;
+	for (int i = 0; i < this->map.rows; i++)
+		for (int j = 0; j < this->map.cols; j++)
+		{
+			if (this->map.map[i][j]->get_symbol() == GROUND_SYMBOL) c++;
+			if (c == num) return this->map.map[i][j]->get_point();
+		}
+}
+
 void GameManager::collide(Actor* left, Actor* right)
 {
 	left->collide(right);
@@ -97,16 +113,10 @@ void GameManager::generateUnits()
 	}
 	this->princess = new Princess(1, 0, pnt.x, pnt.y);
 	this->map.addActor(this->princess);
-	int i = 0;
-	while(i < 30)
+	for (int i = 0; i < 30; i++)
 	{
-		pnt.x = rand() % (this->map.rows - 1) + 1;
-		pnt.y = rand() % (this->map.cols - 1) + 1;
-		if (this->map.map[pnt.x][pnt.y]->get_symbol() == '.')
-		{
-			this->addActor('Z', pnt.x, pnt.y);
-			i++;
-		}
+		Point pnt = this->findFreePlace();
+		this->addActor('Z', pnt.x, pnt.y);
 	}
 }
 
@@ -141,7 +151,6 @@ void GameManager::refreshInfo()
 	mvwprintw(this->info_win, 2, 0, "Damage: %d", this->knight->get_damage());
 	Point pnt = this->knight->get_point();
 	mvwprintw(this->info_win, 3, 0, "Сoordinate: %d %d", pnt.y, pnt.x);
-	//mvwprintw(this->info_win, 4, 0, "Vector size: %d", this->actors.size());
 	wrefresh(this->info_win);
 }
 

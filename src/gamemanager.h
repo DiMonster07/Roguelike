@@ -5,8 +5,6 @@
 #include "units.h"
 #include "map.h"
 
-#define KEY_DAMAGE ' '
-
 class GameManager
 {
 private:
@@ -25,6 +23,7 @@ public:
 	void refreshInfo();
 	int keyCallback(int key);
 	void selectStartPos();
+	Point findFreePlace();
 	void unitsMove();
 	void addActor(char c, int x, int y);
 	void deleteActor(Actor *actor);

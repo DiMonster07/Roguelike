@@ -1,7 +1,6 @@
 #include "map.h"
 #include "gamemanager.h"
 #include "units.h"
-#include "spawners.h"
 #include <malloc.h>
 #include <fstream>
 #include <iostream>
