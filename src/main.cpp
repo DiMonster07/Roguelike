@@ -1,4 +1,3 @@
-
 #include "gamemanager.h"
 
 using namespace std;

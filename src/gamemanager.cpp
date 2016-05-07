@@ -1,33 +1,18 @@
 #include "gamemanager.h"
-
-const int vis_range = 3;
-const int att_range = 1;
-
 const char *dir = "../src/map.txt";
 
 void initColorPairs();
-
-Point GameManager::findFreePlace(Point lp, Point rp)
-{
-	int c = 0;
-	for (int i = lp.x; i <= rp.x; i++)
-		for (int j = lp.y; j <= rp.y; j++)
-			if (this->map.map[i][j]->get_symbol() == GROUND_SYMBOL) c++;
-	int num = rand() % c + 1;
-	c = 0;
-	for (int i = lp.x; i <= rp.x; i++)
-		for (int j = lp.y; j <= rp.y; j++)
-		{
-			if (this->map.map[i][j]->get_symbol() == GROUND_SYMBOL) c++;
-			if (c == num) return this->map.map[i][j]->get_point();
-		}
-}
 
 void GameManager::collide(Actor* left, Actor* right)
 {
 	left->collide(right);
 	if (right->is_die())
 	{
+		if (right == this->map.knight)
+		{
+			is_end_game = false;
+			return;
+		};
 		Point pl = left->get_point();
 		Point pr = right->get_point();
 		this->deleteActor(right);
@@ -37,40 +22,14 @@ void GameManager::collide(Actor* left, Actor* right)
 	}
 }
 
-void GameManager::gameLoop()
+void GameManager::actorsActions()
 {
-	this->selectStartPos();
- 	this->generateUnits();
- 	this->refreshGrid();
-	while (1)
+	for (int i = 0; i < this->map.actors.size(); i++)
 	{
-		int command = wgetch(this->game_win);
-		if (this->keyCallback(command)) break;
-		this->unitsMove();
-		this->refreshGrid();
-	}
-}
-
-void GameManager::unitsMove()
-{
-	Point p_knight = this->knight->get_point();
-	for (int i = 0; i < this->actors.size(); i++)
-	{
-		Point offset = this->actors[i]->get_point();
-		if ((abs(offset.x - p_knight.x) <= vis_range) &&
-			(abs(offset.y - p_knight.y) <= vis_range))
-		{
-			offset.x = (p_knight.x - offset.x) < 0 ? -1 : 1;
-			offset.y = (p_knight.y - offset.y) < 0 ? -1 : 1;
-		}
-		else
-		{
-			offset.x = rand() % 3 - 1;
-			offset.y = rand() % 3 - 1;
-		}
-		Point p_act = this->actors[i]->get_point();
-		this->collide(this->actors[i],
-			this->map.map[p_act.x + offset.x][p_act.y + offset.y]);
+		Point direction = this->map.actors[i]->get_direction(this->map);
+		Point p_actor = this->map.actors[i]->get_point();
+		this->collide(this->map.actors[i],
+			this->map.map[p_actor.x + direction.x][p_actor.y + direction.y]);
 	}
 }
 
@@ -97,7 +56,7 @@ void GameManager::knightAttack()
 
 void GameManager::generateUnits()
 {
-	Point pnt = this->knight->get_point();
+	Point pnt = this->map.knight->get_point();
 	while (1)
 	{
 		int xn = rand() % (this->map.rows - 2) + 1;
@@ -111,31 +70,31 @@ void GameManager::generateUnits()
 			break;
 		}
 	}
-	this->princess = new Princess(1, 0, pnt.x, pnt.y);
-	this->map.addActor(this->princess);
+	this->map.princess = new Princess(1, 0, pnt.x, pnt.y);
+	this->map.addActor(this->map.princess);
 	for (int i = 0; i < 30; i++)
 	{
-		Point pnt = this->findFreePlace(Point(1, 1), Point(29, 59));
+		Point pnt = this->findFreePlace(Point(1, 1), Point(28, 58));
 		this->addActor('Z', pnt.x, pnt.y);
 	}
 }
 
 int GameManager::keyCallback(int key)
 {
-	Point pnt = this->knight->get_point();
+	Point pnt = this->map.knight->get_point();
 	switch(key)
 	{
 		case KEY_UP:
-			this->collide(this->knight, this->map.map[pnt.x - 1][pnt.y]);
+			this->collide(this->map.knight, this->map.map[pnt.x - 1][pnt.y]);
 			break;
 		case KEY_DOWN:
-			this->collide(this->knight, this->map.map[pnt.x + 1][pnt.y]);
+			this->collide(this->map.knight, this->map.map[pnt.x + 1][pnt.y]);
 			break;
 		case KEY_RIGHT:
-			this->collide(this->knight, this->map.map[pnt.x][pnt.y + 1]);
+			this->collide(this->map.knight, this->map.map[pnt.x][pnt.y + 1]);
 			break;
 		case KEY_LEFT:
-			this->collide(this->knight, this->map.map[pnt.x][pnt.y - 1]);
+			this->collide(this->map.knight, this->map.map[pnt.x][pnt.y - 1]);
 			break;
 		//case KEY_DAMAGE: this->knightAttack(); break;
 		case 27: return 1;
@@ -147,9 +106,9 @@ void GameManager::refreshInfo()
 {
 	wclear(this->info_win);
 	mvwprintw(this->info_win, 0, 0, "%s", "INFO");
-	mvwprintw(this->info_win, 1, 0, "Health: %d", this->knight->get_hp());
-	mvwprintw(this->info_win, 2, 0, "Damage: %d", this->knight->get_damage());
-	Point pnt = this->knight->get_point();
+	mvwprintw(this->info_win, 1, 0, "Health: %d", this->map.knight->get_hp());
+	mvwprintw(this->info_win, 2, 0, "Damage: %d", this->map.knight->get_damage());
+	Point pnt = this->map.knight->get_point();
 	mvwprintw(this->info_win, 3, 0, "Сoordinate: %d %d", pnt.y, pnt.x);
 	wrefresh(this->info_win);
 }
@@ -161,8 +120,8 @@ void GameManager::selectStartPos()
  		"After selected press SPACE. Press any key now...");
  	wrefresh(this->game_win);
  	wgetch(this->game_win);
-	this->knight = new Knight(100, 3, 1, 1);
-	this->map.map[1][1] = this->knight;
+	this->map.knight = new Knight(100, 3, 1, 1);
+	this->map.map[1][1] = this->map.knight;
 	this->refreshGrid();
 	while(1)
 	{
@@ -177,23 +136,58 @@ void GameManager::selectStartPos()
 	clear();
 }
 
+void GameManager::gameLoop()
+{
+	this->selectStartPos();
+ 	this->generateUnits();
+ 	this->refreshGrid();
+	while (!this->is_end_game)
+	{
+		int command = wgetch(this->game_win);
+		if (this->keyCallback(command)) break;
+		this->actorsActions();
+		this->refreshGrid();
+	}
+}
+
+void freeResources()
+{
+
+}
+
+Point GameManager::findFreePlace(Point lp, Point rp)
+{
+	int c = 0;
+	for (int i = lp.x; i <= rp.x; i++)
+		for (int j = lp.y; j <= rp.y; j++)
+			if (this->map.map[i][j]->get_symbol() == GROUND_SYMBOL) c++;
+	int num = rand() % c + 1;
+	c = 0;
+	for (int i = lp.x; i <= rp.x; i++)
+		for (int j = lp.y; j <= rp.y; j++)
+		{
+			if (this->map.map[i][j]->get_symbol() == GROUND_SYMBOL) c++;
+			if (c == num) return this->map.map[i][j]->get_point();
+		}
+}
+
 void GameManager::addActor(char c, int x, int y)
 {
 	 switch(c)
 	 {
-	 	case 'Z': this->actors.push_back(new Zombie(4, 2, x, y)); break;
-	 	case 'D': this->actors.push_back(new Dragon(70, 25, x, y)); break;
+	 	case 'Z': this->map.actors.push_back(new Zombie(4, 2, x, y)); break;
+	 	case 'D': this->map.actors.push_back(new Dragon(70, 25, x, y)); break;
 	 }
-	 this->map.addActor(this->actors[this->actors.size() - 1]);
+	 this->map.addActor(this->map.actors[this->map.actors.size() - 1]);
 }
 
 void GameManager::deleteActor(Actor *actor)
 {
-	for (int i = 0; i < this->actors.size(); i++)
+	for (int i = 0; i < this->map.actors.size(); i++)
 	{
-		if (this->actors[i] == actor)
+		if (this->map.actors[i] == actor)
 		{
-			this->actors.erase(this->actors.begin() + i);
+			this->map.actors.erase(this->map.actors.begin() + i);
 			break;
 		}
 	}
@@ -252,6 +246,7 @@ void initColorPairs()
 	init_pair(DRAGON_COLOR, 1, 0);
 	init_pair(ZOMBIES_SPAWN_COLOR, 0, 2);
 	init_pair(DRAGONS_SPAWN_COLOR, 0, 1);
+	init_pair(WIZARD_COLOR, 7, 4);
 	init_pair(BASE_COLOR, 7, 0);
 }
 /*

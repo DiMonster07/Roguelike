@@ -79,6 +79,24 @@ void Monster::collide(Princess *princess)
 	exit(0);
 };
 
+Point Monster::get_direction(Map& map)
+{
+	Point p_knight = map.knight->get_point();
+	Point offset = this->get_point();
+	if ((abs(offset.x - p_knight.x) <= vis_range) &&
+		(abs(offset.y - p_knight.y) <= vis_range))
+	{
+		offset.x = (p_knight.x - offset.x) < 0 ? -1 : 1;
+		offset.y = (p_knight.y - offset.y) < 0 ? -1 : 1;
+	}
+	else
+	{
+		offset.x = rand() % 3 - 1;
+		offset.y = rand() % 3 - 1;
+	}
+	return offset;
+};
+
 char Zombie::get_symbol()
 {
 	return ZOMBIE_SYMBOL;
@@ -97,6 +115,16 @@ char Dragon::get_symbol()
 int Dragon::get_color()
 {
 	return DRAGON_COLOR;
+};
+
+char Wizard::get_symbol()
+{
+	return WIZARD_SYMBOL;
+};
+
+int Wizard::get_color()
+{
+	return WIZARD_COLOR;
 };
 
 void Ground::collide(Actor *actor)
@@ -175,33 +203,3 @@ int SpawnDragons::get_color()
 {
     return DRAGONS_SPAWN_COLOR;
 }
-
-void SpawnDragons::collide(Actor* actor)
-{
-	actor->collide(this);
-};
-
-void SpawnDragons::collide(Knight* knight)
-{
-	this->set_hp(this->get_hp() - knight->get_damage());
-};
-
-void SpawnDragons::collide(Monster *monster)
-{
-	this->set_hp(this->get_hp() - monster->get_damage());
-};
-
-void SpawnZombies::collide(Actor* actor)
-{
-	actor->collide(this);
-};
-
-void SpawnZombies::collide(Knight* knight)
-{
-	this->set_hp(this->get_hp() - knight->get_damage());
-};
-
-void SpawnZombies::collide(Monster *monster)
-{
-	this->set_hp(this->get_hp() - monster->get_damage());
-};

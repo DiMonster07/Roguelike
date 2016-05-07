@@ -4,7 +4,7 @@
 #include <vector>
 #include <iostream>
 #include "point.h"
-#include "meta.h"
+#include "map.h"
 
 class Actor
 {
@@ -21,15 +21,15 @@ public:
 	int get_hp();
 	void set_hp(int value);
 	bool is_die();
-	virtual char get_symbol() {};
 	virtual int get_color() {};
+	virtual char get_symbol() {};
+	virtual Point get_direction(Map& map) {};
 	virtual void collide(Actor* actor) = 0;
     virtual void collide(Character* character) {};
     virtual void collide(Knight* knight) {};
     virtual void collide(Princess* princess) {};
     virtual void collide(Monster* monster) {};
-	virtual void collide(SpawnZombies* spawnZombies) {};
-	virtual void collide(SpawnDragons* spawnDragons) {};
+	virtual void collide(Spawn* spawn) {};
 	virtual void collide(Ground* ground) {};
 	virtual void collide(Wall* wall) {};
 };
@@ -49,8 +49,8 @@ class Knight: public Character
 public:
 	Knight () {};
 	Knight (int h, int d, int x, int y) : Character (h, d, x, y) {};
-	char get_symbol();
 	int get_color();
+	char get_symbol();
 	void collide(Actor* actor);
 	void collide(Knight* knight) {};
 	void collide(Monster *monster);
@@ -78,6 +78,7 @@ public:
 	void collide(Knight* knight);
 	void collide(Monster *monster) {};
 	void collide(Princess* princess);
+	Point get_direction(Map& map);
 };
 
 class Zombie: public Monster
@@ -85,8 +86,8 @@ class Zombie: public Monster
 public:
 	Zombie () {};
 	Zombie (int h, int d, int x, int y) : Monster (h, d, x, y) {};
-	char get_symbol();
 	int get_color();
+	char get_symbol();
 };
 
 class Dragon: public Monster
@@ -94,8 +95,17 @@ class Dragon: public Monster
 public:
 	Dragon () {};
 	Dragon (int h, int d, int x, int y) : Monster (h, d, x, y) {};
-	char get_symbol();
 	int get_color();
+	char get_symbol();
+};
+
+class Wizard: public Monster
+{
+public:
+	Wizard () {};
+	Wizard (int h, int d, int x, int y) : Monster (h, d, x, y) {};
+	int get_color();
+	char get_symbol();
 };
 
 class Environment: public Actor
@@ -110,8 +120,8 @@ class Wall: public Environment
 public:
 	Wall () : Environment(0, 0, 0) {};
 	Wall (int h, int x, int y) : Environment(h, x, y) {};
-	char get_symbol();
 	int get_color();
+	char get_symbol();
 	void collide(Actor* actor) {};
 	void collide(Knight* knight) {};
 	void collide(Monster* monster) {};
@@ -122,8 +132,8 @@ class Ground: public Environment
 public:
 	Ground () : Environment(0, 0, 0) {};
 	Ground (int h, int x, int y) : Environment(h, x, y) {};
-	char get_symbol();
 	int get_color();
+	char get_symbol();
 	void collide(Actor* actor);
 	void collide(Knight* knight);
 	void collide(Monster* monster);
@@ -137,6 +147,9 @@ protected:
 public:
     Spawn () : Actor(0, 0, 0) {};
     Spawn (int h, int x, int y, int t) : timer(t), Actor(h, x, y) {};
+	void collide(Actor* actor) {};
+	void collide(Knight* knight) {};
+	void collide(Monster *monster) {};
 };
 
 class SpawnZombies: public Spawn
@@ -144,11 +157,8 @@ class SpawnZombies: public Spawn
 public:
     SpawnZombies () : Spawn(0, 0, 0, 0) {};
     SpawnZombies (int h, int x, int y, int t) : Spawn(h, x, y, t) {};
-    char get_symbol();
 	int get_color();
-    void collide(Actor* actor);
-	void collide(Knight* knight);
-	void collide(Monster *monster);
+	char get_symbol();
 };
 
 class SpawnDragons: public Spawn
@@ -156,9 +166,6 @@ class SpawnDragons: public Spawn
 public:
     SpawnDragons () : Spawn(0, 0, 0, 0) {};
     SpawnDragons (int h, int x, int y, int t) : Spawn(h, x, y, t) {};
-    char get_symbol();
 	int get_color();
-    void collide(Actor* actor);
-	void collide(Knight* knight);
-	void collide(Monster *monster);
+	char get_symbol();
 };

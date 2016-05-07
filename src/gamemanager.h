@@ -3,7 +3,6 @@
 #include <panel.h>
 #include <vector>
 #include "units.h"
-#include "map.h"
 
 class GameManager
 {
@@ -11,9 +10,7 @@ private:
 	WINDOW *game_win, *info_win;
 public:
 	Map map;
-	Knight *knight;
-	Princess *princess;
-	std::vector<Actor*> actors;
+	bool is_end_game = false;
 	GameManager(const char *name_map);
 	static GameManager& instance();
 	void initConsole();
@@ -24,11 +21,12 @@ public:
 	int keyCallback(int key);
 	void selectStartPos();
 	Point findFreePlace(Point lp, Point rp);
-	void unitsMove();
+	void actorsActions();
 	void addActor(char c, int x, int y);
 	void deleteActor(Actor *actor);
 	void generateUnits();
 	void knightAttack();
 	void gameLoop();
+	void freeResources();
 	void collide(Actor* left, Actor* right);
 };
