@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include "meta.h"
+#include "point.h"
 
 class Map
 {
@@ -12,10 +13,14 @@ public:
 	int cols, rows;
 	Knight *knight;
 	Princess *princess;
+	std::vector<Spawn*> spawns;
 	std::vector<Actor*> actors;
 	std::vector< std::vector<Actor*> > map;
 	Map() {};
 	Map(const char *name_map);
-	void addActor(Actor *actor);
+	void changeActor(Actor *actor);
+	void addSpawn();
+	Point findFreePlace(Point lp, Point rp);
+	void addActor(char c, int x, int y);
 	void printMap(WINDOW *win);
 };

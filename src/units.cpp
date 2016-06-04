@@ -4,38 +4,38 @@
 Point Actor::get_point()
 {
 	return this->point;
-}
+};
 
 void Actor::set_point(int x, int y)
 {
 	this->point.x = x;
 	this->point.y = y;
-}
+};
 
 void Actor::set_point(Point p)
 {
 	this->point = p;
-}
+};
 
 int Actor::get_hp()
 {
 	return this->health;
-}
+};
 
 void Actor::set_hp(int value)
 {
 	this->health = value;
-}
+};
 
 bool Actor::is_die()
 {
 	return this->get_hp() > 0 ? false : true;
-}
+};
 
 int Character::get_damage()
 {
 	return this->damage;
-}
+};
 
 void Knight::collide(Actor* actor)
 {
@@ -130,17 +130,17 @@ int Wizard::get_color()
 void Ground::collide(Actor *actor)
 {
 	actor->collide(this);
-}
+};
 
 void Ground::collide(Knight* knight)
 {
 	this->set_hp(this->get_hp() - knight->get_damage());
-}
+};
 
 void Ground::collide(Monster* monster)
 {
 	this->set_hp(this->get_hp() - monster->get_damage());
-}
+};
 
 char Wall::get_symbol()
 {
@@ -184,22 +184,32 @@ int Princess::get_color()
 	return PRINCESS_COLOR;
 };
 
+void SpawnZombies::action(Map& map)
+{
+
+};
+
 char SpawnZombies::get_symbol()
 {
     return ZOMBIES_SPAWN_SYMBOL;
-}
+};
 
 int SpawnZombies::get_color()
 {
     return ZOMBIES_SPAWN_COLOR;
-}
+};
+
+void SpawnDragons::action(Map& map)
+{
+
+};
 
 char SpawnDragons::get_symbol()
 {
     return DRAGONS_SPAWN_SYMBOL;
-}
+};
 
 int SpawnDragons::get_color()
 {
     return DRAGONS_SPAWN_COLOR;
-}
+};

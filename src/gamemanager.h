@@ -21,12 +21,12 @@ public:
 	int keyCallback(int key);
 	void selectStartPos();
 	Point findFreePlace(Point lp, Point rp);
-	void actorsActions();
-	void addActor(char c, int x, int y);
+	int actorsActions();
 	void deleteActor(Actor *actor);
 	void generateUnits();
-	void knightAttack();
+	void spawnActions();
 	void gameLoop();
+	void gameEnd(int status);
 	void freeResources();
-	void collide(Actor* left, Actor* right);
+	int collide(Actor* left, Actor* right);
 };

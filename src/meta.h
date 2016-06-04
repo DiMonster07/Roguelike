@@ -1,4 +1,5 @@
 #pragma once
+#include "point.h"
 #define GROUND_SYMBOL '.'
 #define WALL_SYMBOL '#'
 #define KNIGHT_SYMBOL 'K'
@@ -10,6 +11,17 @@
 #define WIZARD_SYMBOL 'W'
 
 #define KEY_DAMAGE ' '
+
+#define LEFT_ANG Point(1, 1)
+#define RIGHT_ANG Point(28, 58)
+#define UP_DIRECTION Point(-1, 0)
+#define DOWN_DIRECTION Point(1, 0)
+#define LEFT_DIRECTION Point(0, -1)
+#define RIGHT_DIRECTION Point(0, 1)
+
+#define GAME_WIN 2
+#define GAME_LOSE 1
+#define GAME_CONTINUE 0
 
 const int vis_range = 3;
 const int att_range = 1;
