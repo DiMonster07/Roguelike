@@ -17,27 +17,36 @@ Map::Map(const char* name_map)
 		for (int j = 0; j < this->cols; j++)
 		{
 			Actor* new_actor;
+			SpawnDragons* new_spawnd;
+			SpawnZombies* new_spawnz;
 			input >> c;
 			switch(c)
 			{
 				case WALL_SYMBOL:
-					new_actor = new Wall(3, i, j); break;
+					new_actor = new Wall(3, Point(i, j));
+					row.push_back(new_actor);
+					break;
 				case GROUND_SYMBOL:
-					new_actor = new Ground(1, i, j); break;
+					new_actor = new Ground(1, Point(i, j));
+					row.push_back(new_actor);
+					break;
 				case DRAGONS_SPAWN_SYMBOL:
-					new_actor = new SpawnDragons(60, i, j, 15);
-					//this->spawns.push_back(new_actor);
+					new_spawnd = new SpawnDragons(60, dragon_spawn_timer,
+						Point(i, j));
+					this->spawns.push_back(new_spawnd);
+					row.push_back(new_spawnd);
 					break;
 				case ZOMBIES_SPAWN_SYMBOL:
-					new_actor = new SpawnZombies(30, i, j, 5);
-					//this->spawns.push_back(new_actor);
+					new_spawnz = new SpawnZombies(30, zombies_spawn_timer,
+						Point(i, j));
+					this->spawns.push_back(new_spawnz);
+					row.push_back(new_spawnz);
 					break;
 			}
-			row.push_back(new_actor);
 		}
 		map.push_back(row);
 	}
-}
+};
 
 Point Map::findFreePlace(Point lp, Point rp)
 {
@@ -53,24 +62,28 @@ Point Map::findFreePlace(Point lp, Point rp)
 			if (this->map[i][j]->get_symbol() == GROUND_SYMBOL) c++;
 			if (c == num) return this->map[i][j]->get_point();
 		}
-}
+};
 
-void Map::addActor(char c, int x, int y)
+void Map::addActor(char c, Point p)
 {
 	 switch(c)
 	 {
-	 	case 'Z': this->actors.push_back(new Zombie(4, 2, x, y)); break;
-	 	case 'D': this->actors.push_back(new Dragon(70, 25, x, y)); break;
+	 	case ZOMBIE_SYMBOL:
+			this->actors.push_back(new Zombie(4, 2, p)); break;
+	 	case DRAGON_SYMBOL:
+			this->actors.push_back(new Dragon(70, 25, p)); break;
+		case BONUS_HEALTH_SYMBOL:
+			this->actors.push_back(new Health(1, bonus_health_value, p)); break;
 	 }
 	 this->changeActor(this->actors[this->actors.size() - 1]);
-}
+};
 
 void Map::changeActor(Actor *actor)
 {
 	Point p = actor->get_point();
 	delete this->map[p.x][p.y];
 	this->map[p.x][p.y] = actor;
-}
+};
 
 void Map::printMap(WINDOW *win)
 {
@@ -83,4 +96,4 @@ void Map::printMap(WINDOW *win)
 		}
 	}
 	wattron(win, COLOR_PAIR(BASE_COLOR));
-}
+};

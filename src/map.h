@@ -21,6 +21,6 @@ public:
 	void changeActor(Actor *actor);
 	void addSpawn();
 	Point findFreePlace(Point lp, Point rp);
-	void addActor(char c, int x, int y);
+	void addActor(char c, Point p);
 	void printMap(WINDOW *win);
 };

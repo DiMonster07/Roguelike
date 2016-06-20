@@ -32,6 +32,38 @@ bool Actor::is_die()
 	return this->get_hp() > 0 ? false : true;
 };
 
+int Bonus::get_value()
+{
+	return this->value;
+};
+
+void Health::collide(Actor* actor)
+{
+	actor->collide(this);
+};
+
+void Health::collide(Knight* knight)
+{
+	this->set_hp(this->get_hp() - knight->get_damage());
+	knight->set_hp(knight->get_hp() + this->get_value());
+};
+
+void Health::collide(Monster* monster)
+{
+	this->set_hp(this->get_hp() - monster->get_damage());
+	monster->set_hp(monster->get_hp() + this->get_value());
+};
+
+int Health::get_color()
+{
+	return BONUS_HEALTH_COLOR;
+};
+
+char Health::get_symbol()
+{
+	return BONUS_HEALTH_SYMBOL;
+};
+
 int Character::get_damage()
 {
 	return this->damage;
@@ -45,11 +77,6 @@ void Knight::collide(Actor* actor)
 void Knight::collide(Monster *monster)
 {
 	this->set_hp(this->get_hp() - monster->get_damage());
-};
-
-void Knight::collide(Ground *ground)
-{
-	this->set_hp(this->get_hp() - 1);
 };
 
 char Knight::get_symbol()
@@ -169,9 +196,7 @@ void Princess::collide(Actor* actor)
 
 void Princess::collide(Knight* knight)
 {
-	mvprintw(1, 1, "YOU WIN!");
-	sleep(1);
-	//exit(0);
+	this->set_hp(this->get_hp() - knight->get_damage());
 };
 
 char Princess::get_symbol()
@@ -184,9 +209,39 @@ int Princess::get_color()
 	return PRINCESS_COLOR;
 };
 
+void Spawn::dec()
+{
+	this->count--;
+};
+
+int Spawn::get_count()
+{
+	return this->count;
+};
+
+void SpawnHealth::action(Map& map)
+{
+	if(this->timer-- == 0)
+	{
+		if(this->count < 5)
+		{
+			this->count++;
+			Point p = map.findFreePlace(LEFT_ANG, RIGHT_ANG);
+			map.addActor(BONUS_HEALTH_SYMBOL, p);
+		}
+		this->timer = health_spawn_timer;
+	}
+};
+
 void SpawnZombies::action(Map& map)
 {
-
+	Point my_p = this->get_point();
+	if (this->timer-- == 0)
+	{
+		Point p = map.findFreePlace(my_p - spawn_range, my_p + spawn_range);
+		map.addActor(ZOMBIE_SYMBOL, p);
+		this->timer = zombies_spawn_timer;
+	}
 };
 
 char SpawnZombies::get_symbol()
@@ -201,7 +256,13 @@ int SpawnZombies::get_color()
 
 void SpawnDragons::action(Map& map)
 {
-
+	Point my_p = this->get_point();
+	if (this->timer-- == 0)
+	{
+		Point p = map.findFreePlace(my_p - spawn_range, my_p + spawn_range);
+		map.addActor(DRAGON_SYMBOL, p);
+		this->timer = dragon_spawn_timer;
+	}
 };
 
 char SpawnDragons::get_symbol()

@@ -18,6 +18,7 @@ public:
 	void deleteGrids();
 	void refreshGrid();
 	void refreshInfo();
+	int readActorsInfo();
 	int keyCallback(int key);
 	void selectStartPos();
 	Point findFreePlace(Point lp, Point rp);

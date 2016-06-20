@@ -9,6 +9,7 @@
 #define DRAGONS_SPAWN_SYMBOL '@'
 #define ZOMBIES_SPAWN_SYMBOL '%'
 #define WIZARD_SYMBOL 'W'
+#define BONUS_HEALTH_SYMBOL '+'
 
 #define KEY_DAMAGE ' '
 
@@ -26,6 +27,11 @@
 const int vis_range = 3;
 const int att_range = 1;
 const int spawn_range = 10;
+const int zombies_spawn_timer = 10;
+const int dragon_spawn_timer = 20;
+const int health_spawn_timer = 3;
+const int bonus_health_value = 10;
+const int knight_health = 300;
 
 class Actor;
 class Character;
@@ -39,6 +45,7 @@ class Ground;
 class Spawn;
 class SpawnDragons;
 class SpawnZombies;
+class Health;
 class Map;
 
 enum COLORS_UNITS
@@ -52,5 +59,6 @@ enum COLORS_UNITS
 	ZOMBIES_SPAWN_COLOR = 7,
 	DRAGONS_SPAWN_COLOR = 8,
 	WIZARD_COLOR = 9,
-	BASE_COLOR = 10
+	BONUS_HEALTH_COLOR = 10,
+	BASE_COLOR = 11
 };
