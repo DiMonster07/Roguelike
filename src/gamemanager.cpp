@@ -11,7 +11,7 @@ int GameManager::collide(Actor* left, Actor* right)
 	{
 		if (right == this->map.knight) return GAME_LOSE;
 		if (right == this->map.princess) return GAME_WIN;
-		if (right->get_symbol() == BONUS_HEALTH_SYMBOL)
+		if (right->get_symbol() == BONUS_MEDKIT_COLOR)
 			this->map.spawns.back()->dec();
 		Point pl = left->get_point();
 		Point pr = right->get_point();
@@ -31,6 +31,8 @@ int GameManager::actorsActions()
 		Point p = this->map.actors[i]->get_point() + direction;
 		int status = this->collide(this->map.actors[i], this->map.map[p.x][p.y]);
 		if(status) return status;
+		if (this->map.actors[i]->get_symbol() == WIZARD_SYMBOL)
+			this->map.actors[i]->action(this->map);
 	}
 	return GAME_CONTINUE;
 };
@@ -44,7 +46,7 @@ void GameManager::spawnActions()
 	}
 };
 
-int GameManager::keyCallback(int key)
+int GameManager::gameCallback(int key)
 {
 	Point pnt = this->map.knight->get_point();
 	switch(key)
@@ -78,7 +80,7 @@ void GameManager::gameLoop()
 	while (!this->is_end_game)
 	{
 		int command = wgetch(this->game_win);
-		if (int status = this->keyCallback(command))
+		if (int status = this->gameCallback(command))
 		{
 			this->gameEnd(status);
 			break;
@@ -122,7 +124,7 @@ void GameManager::selectStartPos()
 	{
 		int command = wgetch(this->game_win);
 		if (command == ' ') break;
-		this->keyCallback(command);
+		this->gameCallback(command);
 		this->refreshGrid();
 	}
 	wrefresh(this->game_win);
@@ -187,22 +189,42 @@ void GameManager::gameEnd(int status)
 	usleep(1000000);
 };
 
+void GameManager::menuLoop()
+{
+	while(true)
+	{
+		this->printMenu();
+		int command = wgetch(this->game_win);
+		if (!this->menuCallback(command)) break;
+	}
+};
+
+int GameManager::menuCallback(int key)
+{
+	switch(key)
+	{
+		case GAME_START: this->gameLoop(); break;
+		case CREATE_MAP: this->mapConstruct(); break;
+		case GAME_EXIT: return 0; break;
+	}
+	return 1;
+};
+
+void GameManager::printMenu()
+{
+	wclear(this->info_win);
+	wclear(this->game_win);
+	mvwprintw(this->game_win, 1, 3, "%s", "MENU:");
+	mvwprintw(this->game_win, 3, 3, "%s", "1 - Start game");
+	mvwprintw(this->game_win, 4, 3, "%s", "2 - Create/Change map");
+	mvwprintw(this->game_win, 5, 3, "%s", "0 - Exit");
+	wrefresh(this->game_win);
+};
+
 void GameManager::refreshGrid()
 {
 	this->map.printMap(this->game_win);
 	this->refreshInfo();
-};
-
-void GameManager::initConsole()
-{
-	initscr();
-	noecho();
-	curs_set(FALSE);
-	cbreak();
-	start_color();
-	initColorPairs();
-	clear();
-	srand(time(0));
 };
 
 void GameManager::createGrids()
@@ -218,6 +240,18 @@ void GameManager::deleteGrids()
 	delwin(this->info_win);
 };
 
+void GameManager::initConsole()
+{
+	initscr();
+	noecho();
+	curs_set(FALSE);
+	cbreak();
+	start_color();
+	initColorPairs();
+	clear();
+	srand(time(0));
+};
+
 GameManager::GameManager(const char *name_map)
 {
 	this->map = Map(name_map);
@@ -231,7 +265,7 @@ GameManager& GameManager::instance()
 
 int GameManager::readActorsInfo()
 {
-	
+	return 0;
 };
 
 void initColorPairs()
@@ -245,8 +279,13 @@ void initColorPairs()
 	init_pair(ZOMBIES_SPAWN_COLOR, 0, 2);
 	init_pair(DRAGONS_SPAWN_COLOR, 0, 1);
 	init_pair(WIZARD_COLOR, 7, 4);
-	init_pair(BONUS_HEALTH_COLOR, 1, 7);
+	init_pair(BONUS_MEDKIT_COLOR, 1, 7);
 	init_pair(BASE_COLOR, 7, 0);
+};
+
+void GameManager::mapConstruct()
+{
+
 };
 /*
 		COLOR_BLACK   0

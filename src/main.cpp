@@ -8,7 +8,7 @@ int main(int argc, char **argv)
 	{
 		GameManager::instance().initConsole();
 		GameManager::instance().createGrids();
-		GameManager::instance().gameLoop();
+		GameManager::instance().menuLoop();
 		GameManager::instance().deleteGrids();
 		endwin();
     };

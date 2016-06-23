@@ -32,31 +32,50 @@ public:
     virtual void collide(Monster* monster) { };
 	virtual void collide(Spawn* spawn) { };
 	virtual void collide(Ground* ground) { };
-	virtual void collide(Health* health) { };
+	virtual void collide(Medkit* medkit) { };
 	virtual void collide(Wall* wall) { };
 };
 
-class Bonus: public Actor
+class Object: public Actor
 {
 protected:
 	int value;
 public:
-	Bonus () : value(0), Actor(0, Point()) { };
-	Bonus (int h, int v, Point p) : value(v), Actor(h, p) { };
+	Object () : value(0), Actor(0, Point()) { };
+	Object (int h, int v, Point p) : value(v), Actor(h, p) { };
 	int get_value();
 };
 
-class Health: public Bonus
+class Fireball: public Object
+{
+private:
+	Point direction;
+public:
+	Fireball () : Object(0, 0, Point()) { };
+	Fireball (int h, int v, Point p) : Object(h, v, p) { };
+	int get_color();
+	char get_symbol();
+	Point get_direction(Map& map);
+	Point get_direction();
+	void collide(Actor* actor);
+	void collide(Fireball* fireball) { };
+	void collide(Knight* knight);
+	void collide(Monster *monster);
+	void collide(Wizard *wizard);
+};
+
+class Medkit: public Object
 {
 public:
-	Health () : Bonus(0, 0, Point()) { };
-	Health (int h, int v, Point p) : Bonus(h, v, p) { };
+	Medkit () : Object(0, 0, Point()) { };
+	Medkit (int h, int v, Point p) : Object(h, v, p) { };
 	int get_color();
 	char get_symbol();
 	void collide(Actor* actor);
-	void collide(Health* health) { };
+	void collide(Medkit* medkit) { };
 	void collide(Knight* knight);
 	void collide(Monster *monster);
+	void collide(Wizard *wizard);
 };
 
 class Character: public Actor
@@ -80,6 +99,7 @@ public:
 	void collide(Actor* actor);
 	void collide(Knight* knight) { };
 	void collide(Monster *monster);
+	void collide(Wizard *wizard);
 };
 
 class Princess: public Character
@@ -92,6 +112,7 @@ public:
 	void collide(Actor* actor);
 	void collide(Knight* knight);
 	void collide(Princess* princess) { };
+	void collide(Wizard *wizard);
 };
 
 class Monster: public Character
@@ -126,9 +147,13 @@ public:
 
 class Wizard: public Monster
 {
+private:
+	int timer = wizard_timer;
 public:
 	Wizard () { };
 	Wizard (int h, int d, Point p) : Monster (h, d, p) { };
+	void action(Map &map);
+	void createFireball(Map& map, Point direction);
 	int get_color();
 	char get_symbol();
 };
