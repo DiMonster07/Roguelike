@@ -1,5 +1,7 @@
 #pragma once
 #include "point.h"
+#include <map>
+#include <set>
 #define GROUND_SYMBOL '.'
 #define WALL_SYMBOL '#'
 #define KNIGHT_SYMBOL 'K'
@@ -9,7 +11,7 @@
 #define DRAGONS_SPAWN_SYMBOL '@'
 #define ZOMBIES_SPAWN_SYMBOL '%'
 #define WIZARD_SYMBOL 'W'
-#define BONUS_HEALTH_SYMBOL '+'
+#define BONUS_MEDKIT_SYMBOL '+'
 
 #define KEY_DAMAGE ' '
 
@@ -20,12 +22,17 @@
 #define LEFT_DIRECTION Point(0, -1)
 #define RIGHT_DIRECTION Point(0, 1)
 
-#define GAME_WIN 2
-#define GAME_LOSE 1
 #define GAME_CONTINUE 0
+#define GAME_LOSE 1
+#define GAME_WIN 2
+
+#define GAME_START '1'
+#define CREATE_MAP '2'
+#define GAME_EXIT '0'
 
 const int vis_range = 3;
 const int att_range = 1;
+const int wizard_timer = 3;
 const int spawn_range = 10;
 const int zombies_spawn_timer = 10;
 const int dragon_spawn_timer = 20;
@@ -45,8 +52,17 @@ class Ground;
 class Spawn;
 class SpawnDragons;
 class SpawnZombies;
-class Health;
+class Object;
+class Medkit;
 class Map;
+
+static std::map<Point, char> FIREBALL_DIR_SYMBOL =
+{
+	{UP_DIRECTION, '^' },
+	{DOWN_DIRECTION, 'v' },
+	{LEFT_DIRECTION, '<'},
+	{RIGHT_DIRECTION, '>' }
+};
 
 enum COLORS_UNITS
 {
@@ -59,6 +75,7 @@ enum COLORS_UNITS
 	ZOMBIES_SPAWN_COLOR = 7,
 	DRAGONS_SPAWN_COLOR = 8,
 	WIZARD_COLOR = 9,
-	BONUS_HEALTH_COLOR = 10,
-	BASE_COLOR = 11
+	BONUS_MEDKIT_COLOR = 10,
+	FIREBALL_COLOR = 11,
+	BASE_COLOR = 12
 };

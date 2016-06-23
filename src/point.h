@@ -15,4 +15,5 @@ public:
     Point operator/(const int &v);
     bool operator==(const Point &rv);
     bool operator!=(const Point &rv);
+    bool operator<(const Point &rv) const;
 };

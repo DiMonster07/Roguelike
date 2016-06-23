@@ -17,17 +17,26 @@ public:
 	void createGrids();
 	void deleteGrids();
 	void refreshGrid();
+
 	void refreshInfo();
 	int readActorsInfo();
-	int keyCallback(int key);
+
+	int gameCallback(int key);
+	int menuCallback(int key);
+
 	void selectStartPos();
+	int collide(Actor* left, Actor* right);
 	Point findFreePlace(Point lp, Point rp);
 	int actorsActions();
 	void deleteActor(Actor *actor);
-	void generateUnits();
 	void spawnActions();
+	void generateUnits();
+
 	void gameLoop();
+	void menuLoop();
+	void printMenu();
 	void gameEnd(int status);
 	void freeResources();
-	int collide(Actor* left, Actor* right);
+
+	void mapConstruct();
 };
