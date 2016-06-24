@@ -2,7 +2,11 @@
 #include <ncurses.h>
 #include <panel.h>
 #include <vector>
+#include <string>
+#include <unistd.h>
+#include <boost/filesystem.hpp>
 #include "units.h"
+#include "mapconstructor.h"
 
 class GameManager
 {
@@ -11,7 +15,8 @@ private:
 public:
 	Map map;
 	bool is_end_game = false;
-	GameManager(const char *name_map);
+	MapConstructor map_constructor();
+	GameManager(std::string name_map);
 	static GameManager& instance();
 	void initConsole();
 	void createGrids();
@@ -38,5 +43,9 @@ public:
 	void gameEnd(int status);
 	void freeResources();
 
+	void printMenuMap(std::vector<std::string>maps_list, int cursor);
+	std::string selectMap();
+	std::vector<std::string> getFilesList(std::string directory,
+										  std::string file_extension);
 	void mapConstruct();
 };

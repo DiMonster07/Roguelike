@@ -5,7 +5,7 @@
 #include <fstream>
 #include <iostream>
 
-Map::Map(const char* name_map)
+Map::Map(std::string name_map)
 {
 	std::ifstream input(name_map);
 	char c;

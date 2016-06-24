@@ -1,6 +1,10 @@
 #include "gamemanager.h"
-#include <unistd.h>
-const char *dir = "../src/map.txt";
+
+using namespace boost::filesystem;
+
+std::string dir("../src/maps/");
+std::string map_default_name("1.txt");
+std::string fextension(".txt");
 
 void initColorPairs();
 
@@ -112,6 +116,7 @@ void GameManager::refreshInfo()
 
 void GameManager::selectStartPos()
 {
+	wclear(this->game_win);
 	mvwprintw(this->game_win, 0, 1, "%s\n %s",
  		"Please, select you start position.",
  		"After selected press SPACE");
@@ -123,7 +128,7 @@ void GameManager::selectStartPos()
 	while(1)
 	{
 		int command = wgetch(this->game_win);
-		if (command == ' ') break;
+		if (command == KEY_SPACE) break;
 		this->gameCallback(command);
 		this->refreshGrid();
 	}
@@ -199,6 +204,17 @@ void GameManager::menuLoop()
 	}
 };
 
+void GameManager::printMenu()
+{
+	wclear(this->info_win);
+	wclear(this->game_win);
+	mvwprintw(this->game_win, 1, 3, "%s", "MENU:");
+	mvwprintw(this->game_win, 3, 3, "%s", "1 - Start game");
+	mvwprintw(this->game_win, 4, 3, "%s", "2 - Create/Change map");
+	mvwprintw(this->game_win, 5, 3, "%s", "0 - Exit");
+	wrefresh(this->game_win);
+};
+
 int GameManager::menuCallback(int key)
 {
 	switch(key)
@@ -210,16 +226,67 @@ int GameManager::menuCallback(int key)
 	return 1;
 };
 
-void GameManager::printMenu()
+int GameManager::readActorsInfo()
 {
-	wclear(this->info_win);
+	return 0;
+};
+
+void GameManager::mapConstruct()
+{
+	std::string name_map = this->selectMap();
+};
+
+void GameManager::printMenuMap(std::vector<std::string>maps_list, int cursor)
+{
 	wclear(this->game_win);
-	mvwprintw(this->game_win, 1, 3, "%s", "MENU:");
-	mvwprintw(this->game_win, 3, 3, "%s", "1 - Start game");
-	mvwprintw(this->game_win, 4, 3, "%s", "2 - Create/Change map");
-	mvwprintw(this->game_win, 5, 3, "%s", "0 - Exit");
+	mvwprintw(this->game_win, 1, 2, "%s %s", "Select map for editing or press n",
+											 "for create new map:");
+	for (int i = 0; i < maps_list.size(); i++)
+	{
+		std::string str = (i == cursor ? maps_list[i] + CURSOR : maps_list[i]);
+		mvwprintw(this->game_win, i + 3, 5, "%s", str.c_str());
+	}
 	wrefresh(this->game_win);
 };
+
+std::string GameManager::selectMap()
+{
+	std::vector<std::string>maps_list = getFilesList(dir, fextension);
+	std::sort(maps_list.begin(), maps_list.end());
+	int cursor = 0;
+	this->printMenuMap(maps_list, cursor);
+	bool thp = true;
+	while(thp)
+	{
+		int command = wgetch(this->game_win);
+		switch (command)
+		{
+			case KEY_UP: cursor =   (--cursor == -1 ?
+									   cursor = maps_list.size() - 1 : cursor);
+									   break;
+			case KEY_DOWN: cursor = (++cursor == maps_list.size() ?
+									   cursor = 0 : cursor);
+									   break;
+			case KEY_SPACE: thp = false; break;
+			case KEY_N: thp = false; break;
+		}
+		this->printMenuMap(maps_list, cursor);
+	}
+	usleep(2000000);
+};
+
+std::vector<std::string> GameManager::getFilesList(std::string directory,
+												   std::string file_extension)
+{
+	std::vector<std::string>files_list;
+	path p(directory);
+    for (auto i = directory_iterator(p); i != directory_iterator(); i++)
+        if (!is_directory(i->path()) && i->path().extension() == file_extension)
+			files_list.push_back(i->path().filename().c_str());
+	return files_list;
+};
+
+////////////////////////////////////BS/////////////////////////////////////////
 
 void GameManager::refreshGrid()
 {
@@ -252,20 +319,15 @@ void GameManager::initConsole()
 	srand(time(0));
 };
 
-GameManager::GameManager(const char *name_map)
+GameManager::GameManager(std::string name_map)
 {
 	this->map = Map(name_map);
 };
 
 GameManager& GameManager::instance()
 {
-	static GameManager manager(dir);
+	static GameManager manager(dir + map_default_name);
 	return manager;
-};
-
-int GameManager::readActorsInfo()
-{
-	return 0;
 };
 
 void initColorPairs()
@@ -281,11 +343,6 @@ void initColorPairs()
 	init_pair(WIZARD_COLOR, 7, 4);
 	init_pair(BONUS_MEDKIT_COLOR, 1, 7);
 	init_pair(BASE_COLOR, 7, 0);
-};
-
-void GameManager::mapConstruct()
-{
-
 };
 /*
 		COLOR_BLACK   0

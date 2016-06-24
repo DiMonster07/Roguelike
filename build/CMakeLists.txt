@@ -11,4 +11,4 @@ set(SOURCE_FILES
     ../src/point.cpp)
 
 add_executable(Roguelike ${SOURCE_FILES})
-target_link_libraries( Roguelike ncurses panel )
+target_link_libraries( Roguelike ncurses panel boost_system boost_filesystem)
