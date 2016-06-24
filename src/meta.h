@@ -12,8 +12,10 @@
 #define ZOMBIES_SPAWN_SYMBOL '%'
 #define WIZARD_SYMBOL 'W'
 #define BONUS_MEDKIT_SYMBOL '+'
+#define CURSOR std::string(" <--")
+#define KEY_N 'n'
 
-#define KEY_DAMAGE ' '
+#define KEY_SPACE ' '
 
 #define LEFT_ANG Point(1, 1)
 #define RIGHT_ANG Point(28, 58)
@@ -26,9 +28,9 @@
 #define GAME_LOSE 1
 #define GAME_WIN 2
 
+#define GAME_EXIT '0'
 #define GAME_START '1'
 #define CREATE_MAP '2'
-#define GAME_EXIT '0'
 
 const int vis_range = 3;
 const int att_range = 1;

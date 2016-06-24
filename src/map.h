@@ -17,7 +17,7 @@ public:
 	std::vector<Actor*> actors;
 	std::vector< std::vector<Actor*> > map;
 	Map() {};
-	Map(const char *name_map);
+	Map(std::string name_map);
 	void changeActor(Actor *actor);
 	void addSpawn();
 	Point findFreePlace(Point lp, Point rp);
