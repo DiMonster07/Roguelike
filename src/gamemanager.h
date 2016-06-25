@@ -1,21 +1,15 @@
 #pragma once
-#include <ncurses.h>
-#include <panel.h>
-#include <vector>
-#include <string>
 #include <unistd.h>
-#include <boost/filesystem.hpp>
 #include "units.h"
-#include "mapconstructor.h"
+#include "mapmanager.h"
 
 class GameManager
 {
 private:
-	WINDOW *game_win, *info_win;
+	WINDOW *main_win, *info_win;
 public:
 	Map map;
 	bool is_end_game = false;
-	MapConstructor map_constructor();
 	GameManager(std::string name_map);
 	static GameManager& instance();
 	void initConsole();
@@ -47,5 +41,6 @@ public:
 	std::string selectMap();
 	std::vector<std::string> getFilesList(std::string directory,
 										  std::string file_extension);
+	std::string selectNameMap(int size_list);
 	void mapConstruct();
 };

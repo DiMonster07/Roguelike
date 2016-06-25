@@ -2,6 +2,9 @@
 #include "point.h"
 #include <map>
 #include <set>
+#include <ncurses.h>
+#include <panel.h>
+
 #define GROUND_SYMBOL '.'
 #define WALL_SYMBOL '#'
 #define KNIGHT_SYMBOL 'K'
@@ -13,7 +16,14 @@
 #define WIZARD_SYMBOL 'W'
 #define BONUS_MEDKIT_SYMBOL '+'
 #define CURSOR std::string(" <--")
+
+#define DEFAULT_DIR std::string("../src/maps/")
+#define DEFAULT_MAP_NAME std::string("1.txt")
+#define MAP_EXTENSION std::string(".txt")
+
 #define KEY_N 'n'
+#define ROWS_DEFAULT 30
+#define COLS_DEFAULT 60
 
 #define KEY_SPACE ' '
 

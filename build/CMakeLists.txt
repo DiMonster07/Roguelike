@@ -7,6 +7,7 @@ set(SOURCE_FILES
     ../src/main.cpp
     ../src/gamemanager.cpp
     ../src/map.cpp
+    ../src/mapmanager.cpp
     ../src/units.cpp
     ../src/point.cpp)
 

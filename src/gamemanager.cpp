@@ -1,11 +1,5 @@
 #include "gamemanager.h"
 
-using namespace boost::filesystem;
-
-std::string dir("../src/maps/");
-std::string map_default_name("1.txt");
-std::string fextension(".txt");
-
 void initColorPairs();
 
 int GameManager::collide(Actor* left, Actor* right)
@@ -43,11 +37,8 @@ int GameManager::actorsActions()
 
 void GameManager::spawnActions()
 {
-
 	for(int i = 0; i < this->map.spawns.size(); i++)
-	{
 		this->map.spawns[i]->action(this->map);
-	}
 };
 
 int GameManager::gameCallback(int key)
@@ -83,7 +74,7 @@ void GameManager::gameLoop()
  	this->refreshGrid();
 	while (!this->is_end_game)
 	{
-		int command = wgetch(this->game_win);
+		int command = wgetch(this->main_win);
 		if (int status = this->gameCallback(command))
 		{
 			this->gameEnd(status);
@@ -116,25 +107,25 @@ void GameManager::refreshInfo()
 
 void GameManager::selectStartPos()
 {
-	wclear(this->game_win);
-	mvwprintw(this->game_win, 0, 1, "%s\n %s",
+	wclear(this->main_win);
+	mvwprintw(this->main_win, 0, 1, "%s\n %s",
  		"Please, select you start position.",
  		"After selected press SPACE");
- 	wrefresh(this->game_win);
- 	wgetch(this->game_win);
+		wrefresh(this->main_win);
+ 	wgetch(this->main_win);
 	this->map.knight = new Knight(knight_health, 3, Point(1, 1));
 	this->map.map[1][1] = this->map.knight;
 	this->refreshGrid();
 	while(1)
 	{
-		int command = wgetch(this->game_win);
+		int command = wgetch(this->main_win);
 		if (command == KEY_SPACE) break;
 		this->gameCallback(command);
 		this->refreshGrid();
 	}
-	wrefresh(this->game_win);
-	mvwprintw(this->game_win, 0, 0, "%s", "Please press any key. Good luck!");
-	wgetch(this->game_win);
+	wrefresh(this->main_win);
+	mvwprintw(this->main_win, 0, 0, "%s", "Please press any key. Good luck!");
+	wgetch(this->main_win);
 	clear();
 };
 
@@ -178,28 +169,29 @@ void GameManager::deleteActor(Actor *actor)
 
 void GameManager::gameEnd(int status)
 {
-	wclear(this->game_win);
+	wclear(this->main_win);
 	wclear(this->info_win);
 	switch (status)
 	{
 		case GAME_WIN:
-			mvwprintw(this->game_win, 3, 3, "%s", "You WIN! Congratulations!");
+			mvwprintw(this->main_win, 3, 3, "%s", "You WIN! Congratulations!");
 			break;
 		case GAME_LOSE:
-			mvwprintw(this->game_win, 3, 3, "%s", "You LOSE! Sorry =(");
+			mvwprintw(this->main_win, 3, 3, "%s", "You LOSE! Sorry =(");
 			break;
 	};
-	wrefresh(this->game_win);
+	wrefresh(this->main_win);
 	wrefresh(this->info_win);
 	usleep(1000000);
 };
 
 void GameManager::menuLoop()
 {
+	MapManager::instance().initialize(this->main_win, this->info_win);
 	while(true)
 	{
 		this->printMenu();
-		int command = wgetch(this->game_win);
+		int command = wgetch(this->main_win);
 		if (!this->menuCallback(command)) break;
 	}
 };
@@ -207,12 +199,12 @@ void GameManager::menuLoop()
 void GameManager::printMenu()
 {
 	wclear(this->info_win);
-	wclear(this->game_win);
-	mvwprintw(this->game_win, 1, 3, "%s", "MENU:");
-	mvwprintw(this->game_win, 3, 3, "%s", "1 - Start game");
-	mvwprintw(this->game_win, 4, 3, "%s", "2 - Create/Change map");
-	mvwprintw(this->game_win, 5, 3, "%s", "0 - Exit");
-	wrefresh(this->game_win);
+	wclear(this->main_win);
+	mvwprintw(this->main_win, 1, 3, "%s", "MENU:");
+	mvwprintw(this->main_win, 3, 3, "%s", "1 - Start game");
+	mvwprintw(this->main_win, 4, 3, "%s", "2 - Create/Change map");
+	mvwprintw(this->main_win, 5, 3, "%s", "0 - Exit");
+	wrefresh(this->main_win);
 };
 
 int GameManager::menuCallback(int key)
@@ -220,7 +212,7 @@ int GameManager::menuCallback(int key)
 	switch(key)
 	{
 		case GAME_START: this->gameLoop(); break;
-		case CREATE_MAP: this->mapConstruct(); break;
+		case CREATE_MAP: MapManager::instance().mapConstruct(); break;
 		case GAME_EXIT: return 0; break;
 	}
 	return 1;
@@ -231,79 +223,24 @@ int GameManager::readActorsInfo()
 	return 0;
 };
 
-void GameManager::mapConstruct()
-{
-	std::string name_map = this->selectMap();
-};
-
-void GameManager::printMenuMap(std::vector<std::string>maps_list, int cursor)
-{
-	wclear(this->game_win);
-	mvwprintw(this->game_win, 1, 2, "%s %s", "Select map for editing or press n",
-											 "for create new map:");
-	for (int i = 0; i < maps_list.size(); i++)
-	{
-		std::string str = (i == cursor ? maps_list[i] + CURSOR : maps_list[i]);
-		mvwprintw(this->game_win, i + 3, 5, "%s", str.c_str());
-	}
-	wrefresh(this->game_win);
-};
-
-std::string GameManager::selectMap()
-{
-	std::vector<std::string>maps_list = getFilesList(dir, fextension);
-	std::sort(maps_list.begin(), maps_list.end());
-	int cursor = 0;
-	this->printMenuMap(maps_list, cursor);
-	bool thp = true;
-	while(thp)
-	{
-		int command = wgetch(this->game_win);
-		switch (command)
-		{
-			case KEY_UP: cursor =   (--cursor == -1 ?
-									   cursor = maps_list.size() - 1 : cursor);
-									   break;
-			case KEY_DOWN: cursor = (++cursor == maps_list.size() ?
-									   cursor = 0 : cursor);
-									   break;
-			case KEY_SPACE: thp = false; break;
-			case KEY_N: thp = false; break;
-		}
-		this->printMenuMap(maps_list, cursor);
-	}
-	usleep(2000000);
-};
-
-std::vector<std::string> GameManager::getFilesList(std::string directory,
-												   std::string file_extension)
-{
-	std::vector<std::string>files_list;
-	path p(directory);
-    for (auto i = directory_iterator(p); i != directory_iterator(); i++)
-        if (!is_directory(i->path()) && i->path().extension() == file_extension)
-			files_list.push_back(i->path().filename().c_str());
-	return files_list;
-};
-
 ////////////////////////////////////BS/////////////////////////////////////////
 
 void GameManager::refreshGrid()
 {
-	this->map.printMap(this->game_win);
+	this->map.printMap(this->main_win);
 	this->refreshInfo();
 };
 
 void GameManager::createGrids()
 {
-	this->game_win = newwin(30, 60, 0, 0);
+	this->main_win = newwin(30, 60, 0, 0);
 	this->info_win = newwin(30, 20, 0, 61);
-	keypad(this->game_win, TRUE);
+	keypad(this->main_win, TRUE);
 };
 
 void GameManager::deleteGrids()
 {
-	delwin(this->game_win);
+	delwin(this->main_win);
 	delwin(this->info_win);
 };
 
@@ -326,7 +263,7 @@ GameManager::GameManager(std::string name_map)
 
 GameManager& GameManager::instance()
 {
-	static GameManager manager(dir + map_default_name);
+	static GameManager manager(DEFAULT_DIR + DEFAULT_MAP_NAME);
 	return manager;
 };
 
