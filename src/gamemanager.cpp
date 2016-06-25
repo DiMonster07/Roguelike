@@ -105,13 +105,18 @@ void GameManager::refreshInfo()
 	wrefresh(this->info_win);
 };
 
+void GameManager::tsizeUpdate()
+{
+	getmaxyx(stdscr, this->tsizeY, this->tsizeX);
+};
+
 void GameManager::selectStartPos()
 {
 	wclear(this->main_win);
 	mvwprintw(this->main_win, 0, 1, "%s\n %s",
  		"Please, select you start position.",
  		"After selected press SPACE");
-		wrefresh(this->main_win);
+	wrefresh(this->main_win);
  	wgetch(this->main_win);
 	this->map.knight = new Knight(knight_health, 3, Point(1, 1));
 	this->map.map[1][1] = this->map.knight;
@@ -233,8 +238,8 @@ void GameManager::refreshGrid()
 
 void GameManager::createGrids()
 {
-	this->main_win = newwin(30, 60, 0, 0);
-	this->info_win = newwin(30, 20, 0, 61);
+	this->main_win = newwin(this->tsizeY, this->tsizeX - INFO_WIN_WIDTH, 0, 0);
+	this->info_win = newwin(this->tsizeY, INFO_WIN_WIDTH, 0, 61);
 	keypad(this->main_win, TRUE);
 };
 
@@ -254,6 +259,7 @@ void GameManager::initConsole()
 	initColorPairs();
 	clear();
 	srand(time(0));
+	this->tsizeUpdate();
 };
 
 GameManager::GameManager(std::string name_map)

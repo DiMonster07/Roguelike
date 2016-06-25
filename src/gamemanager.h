@@ -7,6 +7,7 @@ class GameManager
 {
 private:
 	WINDOW *main_win, *info_win;
+	int tsizeX, tsizeY;
 public:
 	Map map;
 	bool is_end_game = false;
@@ -16,6 +17,7 @@ public:
 	void createGrids();
 	void deleteGrids();
 	void refreshGrid();
+	void tsizeUpdate();
 
 	void refreshInfo();
 	int readActorsInfo();
@@ -36,11 +38,4 @@ public:
 	void printMenu();
 	void gameEnd(int status);
 	void freeResources();
-
-	void printMenuMap(std::vector<std::string>maps_list, int cursor);
-	std::string selectMap();
-	std::vector<std::string> getFilesList(std::string directory,
-										  std::string file_extension);
-	std::string selectNameMap(int size_list);
-	void mapConstruct();
 };

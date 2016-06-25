@@ -34,7 +34,7 @@ void MapManager::printMenuMap(std::vector<std::string>maps_list, int cursor)
 
 std::string MapManager::selectNameMap(int size_list)
 {
-	mvwprintw(this->main_win, size_list + 5, 2, "%s %s", "Input map name and",
+    mvwprintw(this->main_win, size_list + 5, 2, "%s %s", "Input map name and",
 	                                                     "press enter: ");
 	curs_set(TRUE);
 	nocbreak();
@@ -72,9 +72,10 @@ std::string MapManager::selectMap()
 						cursor = maps_list.size() - 1;
 						this->createMap(maps_list[cursor]);
 						break;
+            case 27: return 0;
 		}
 	}
-	this->changeMap(maps_list[cursor]);
+    return maps_list[cursor];
 };
 
 std::vector<std::string> MapManager::getFilesList(std::string directory,
@@ -90,20 +91,40 @@ std::vector<std::string> MapManager::getFilesList(std::string directory,
 
 void MapManager::createMap(std::string name_map)
 {
+    int sizeX, sizeY;
+    this->selectSizeMap(&sizeX, &sizeY);
     std::ofstream output(DEFAULT_DIR + name_map);
-    output << ROWS_DEFAULT << " " << COLS_DEFAULT << std::endl;
-	for (int i = 0; i < ROWS_DEFAULT; i++)
+    output << sizeY << " " << sizeX << std::endl;
+	for (int i = 0; i < sizeY; i++)
     {
-		for (int j = 0; j < COLS_DEFAULT; j++)
+		for (int j = 0; j < sizeX; j++)
         {
-            char out = ((i == 0 || i == ROWS_DEFAULT - 1) ||
-                        (j == 0 || j == COLS_DEFAULT - 1) ?
+            char out = ((i == 0 || i == sizeY - 1) ||
+                        (j == 0 || j == sizeX - 1) ?
                         WALL_SYMBOL : GROUND_SYMBOL);
             output << out;
         }
         output << std::endl;
     }
     output.close();
+};
+
+void MapManager::selectSizeMap(int *sizeX, int *sizeY)
+{
+    int command;
+    do
+    {
+        getmaxyx(stdscr, *sizeY, *sizeX);
+        wclear(this->main_win);
+        mvwprintw(this->main_win, 0, 0, "%s\n%s\n%s", "Change size of the terminal",
+                                                      "to select size of the map.",
+                                                      "After press SPACE");
+        *sizeX = *sizeX - INFO_WIN_WIDTH;
+        mvwprintw(this->main_win, 3, 0, "Current size: x:%d, y:%d",
+                                        *sizeX, *sizeY);
+        wrefresh(this->main_win);
+    }
+    while(command = wgetch(this->main_win) != KEY_SPACE);
 };
 
 void MapManager::changeMap(std::string name_map)

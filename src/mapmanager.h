@@ -23,5 +23,6 @@ public:
     void createMap(std::string name_map);
     void changeMap(std::string name_map);
     std::vector<std::vector<char>> readMap(std::string name_map);
+    void selectSizeMap(int *sizeX, int *sizeY);
     void writeMap(std::vector<std::vector<char>> map, std::string name_map);
 };

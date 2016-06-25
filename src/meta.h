@@ -18,12 +18,13 @@
 #define CURSOR std::string(" <--")
 
 #define DEFAULT_DIR std::string("../src/maps/")
-#define DEFAULT_MAP_NAME std::string("1.txt")
-#define MAP_EXTENSION std::string(".txt")
+#define DEFAULT_MAP_NAME std::string("1.map")
+#define MAP_EXTENSION std::string(".map")
 
 #define KEY_N 'n'
 #define ROWS_DEFAULT 30
 #define COLS_DEFAULT 60
+#define INFO_WIN_WIDTH 20
 
 #define KEY_SPACE ' '
 
