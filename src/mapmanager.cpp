@@ -93,20 +93,19 @@ void MapManager::createMap(std::string name_map)
 {
     int sizeX, sizeY;
     this->selectSizeMap(&sizeX, &sizeY);
-    std::ofstream output(DEFAULT_DIR + name_map);
-    output << sizeY << " " << sizeX << std::endl;
-	for (int i = 0; i < sizeY; i++)
+    std::vector<std::vector<char>> map;
+    int command;
+    do
     {
-		for (int j = 0; j < sizeX; j++)
-        {
-            char out = ((i == 0 || i == sizeY - 1) ||
-                        (j == 0 || j == sizeX - 1) ?
-                        WALL_SYMBOL : GROUND_SYMBOL);
-            output << out;
-        }
-        output << std::endl;
+
     }
-    output.close();
+    while(command = wgetch(this->main_win))
+    this->writeMap(*map, name_map);
+};
+
+void MapManager::fillMap()
+{
+
 };
 
 void MapManager::selectSizeMap(int *sizeX, int *sizeY)
@@ -124,7 +123,7 @@ void MapManager::selectSizeMap(int *sizeX, int *sizeY)
                                         *sizeX, *sizeY);
         wrefresh(this->main_win);
     }
-    while(command = wgetch(this->main_win) != KEY_SPACE);
+    while(command = wgetch(this->info_win) != KEY_SPACE);
 };
 
 void MapManager::changeMap(std::string name_map)
@@ -154,4 +153,22 @@ void MapManager::writeMap(std::vector<std::vector<char>> map,
                               std::string name_map)
 {
 
+};
+
+void MapManager::writeMap(std::string name_map, int sizeX, int sizeY)
+{
+    std::ofstream output(DEFAULT_DIR + name_map);
+    output << sizeY << " " << sizeX << std::endl;
+	for (int i = 0; i < sizeY; i++)
+    {
+		for (int j = 0; j < sizeX; j++)
+        {
+            char out = ((i == 0 || i == sizeY - 1) ||
+                        (j == 0 || j == sizeX - 1) ?
+                        WALL_SYMBOL : GROUND_SYMBOL);
+            output << out;
+        }
+        output << std::endl;
+    }
+    output.close();
 };

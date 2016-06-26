@@ -21,8 +21,11 @@ public:
     std::vector<std::string> getFilesList(std::string directory,
     									  std::string file_extension);
     void createMap(std::string name_map);
+    void createMap(std::string name_map, int x, int y);
     void changeMap(std::string name_map);
     std::vector<std::vector<char>> readMap(std::string name_map);
     void selectSizeMap(int *sizeX, int *sizeY);
+    void fillMap();
     void writeMap(std::vector<std::vector<char>> map, std::string name_map);
+    void writeMap(std::string name_map, int sizeX, int sizeY);
 };
