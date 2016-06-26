@@ -238,8 +238,10 @@ void GameManager::refreshGrid()
 
 void GameManager::createGrids()
 {
+	this->tsizeUpdate();
 	this->main_win = newwin(this->tsizeY, this->tsizeX - INFO_WIN_WIDTH, 0, 0);
-	this->info_win = newwin(this->tsizeY, INFO_WIN_WIDTH, 0, 61);
+	this->info_win = newwin(this->tsizeY, INFO_WIN_WIDTH, 0, this->tsizeX -
+															 INFO_WIN_WIDTH + 1);
 	keypad(this->main_win, TRUE);
 };
 

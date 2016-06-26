@@ -94,18 +94,36 @@ void MapManager::createMap(std::string name_map)
     int sizeX, sizeY;
     this->selectSizeMap(&sizeX, &sizeY);
     std::vector<std::vector<char>> map;
+    this->fillMap(&map, sizeX, sizeY);
     int command;
     do
     {
-
+        this->printMap(&map, sizeX, sizeY);
     }
-    while(command = wgetch(this->main_win))
-    this->writeMap(*map, name_map);
+    while(command = wgetch(this->main_win) != KEY_SPACE);
+    this->writeMap(&map, name_map);
 };
 
-void MapManager::fillMap()
+void MapManager::fillMap(std::vector<std::vector<char>> *map, int sizeX, int sizeY)
 {
+    for (int i = 0; i < sizeY; i++)
+	{
+		std::vector<char> row;
+		for (int j = 0; j < sizeX; j++)
+            row.push_back(((i == 0 || i == sizeY - 1) ||
+                           (j == 0 || j == sizeX - 1) ?
+                           WALL_SYMBOL : GROUND_SYMBOL));
+		map->push_back(row);
+	}
+};
 
+void MapManager::printMap(std::vector<std::vector<char>> *map, int sizeX, int sizeY)
+{
+    wclear(this->main_win);
+    for (int i = 0; i < sizeY; i++)
+		for (int j = 0; j < sizeX; j++)
+            mvwprintw(this->main_win, i, j, "%c", (*map)[i][j]);
+    wrefresh(this->main_win);
 };
 
 void MapManager::selectSizeMap(int *sizeX, int *sizeY)
@@ -114,13 +132,14 @@ void MapManager::selectSizeMap(int *sizeX, int *sizeY)
     do
     {
         getmaxyx(stdscr, *sizeY, *sizeX);
-        wclear(this->main_win);
-        mvwprintw(this->main_win, 0, 0, "%s\n%s\n%s", "Change size of the terminal",
-                                                      "to select size of the map.",
-                                                      "After press SPACE");
         *sizeX = *sizeX - INFO_WIN_WIDTH;
-        mvwprintw(this->main_win, 3, 0, "Current size: x:%d, y:%d",
-                                        *sizeX, *sizeY);
+        wclear(this->main_win);
+        mvwprintw(this->main_win, 0, 1, "%s %s %s %s. Current size: x:%d, y:%d",
+                                                     "Change size of the",
+                                                     "terminal to select",
+                                                     "size of the map.",
+                                                     "After press SPACE",
+                                                     *sizeX, *sizeY);
         wrefresh(this->main_win);
     }
     while(command = wgetch(this->info_win) != KEY_SPACE);
@@ -149,7 +168,7 @@ std::vector<std::vector<char>> MapManager::readMap(std::string name_map)
     return map;
 };
 
-void MapManager::writeMap(std::vector<std::vector<char>> map,
+void MapManager::writeMap(std::vector<std::vector<char>> *map,
                               std::string name_map)
 {
 
