@@ -2,52 +2,15 @@
 
 using namespace boost::filesystem;
 
-MapManager& MapManager::instance()
-{
-    static MapManager manager;
-	return manager;
-};
-
-void MapManager::initialize(WINDOW* win1, WINDOW* win2)
-{
-    this->main_win = win1;
-    this->info_win = win2;
-};
-
 void MapManager::mapConstruct()
 {
-    std::string name_map = this->selectMap();
+    std::vector<std::vector<char>> map;
+    std::string map_name;
+    if (this->selectMap(&map, &map_name)) this->changeMap(&map);
+    this->writeMap(&map, map_name);
 };
 
-void MapManager::printMenuMap(std::vector<std::string>maps_list, int csr)
-{
-	wclear(this->main_win);
-	mvwprintw(this->main_win, 1, 2, "%s %s", "Select map for editing or press n",
-											 "for create new map:");
-	for (int i = 0; i < maps_list.size(); i++)
-	{
-		std::string str = (i == csr ? maps_list[i] + CURSOR : maps_list[i]);
-		mvwprintw(this->main_win, i + 3, 5, "%s", str.c_str());
-	}
-	wrefresh(this->main_win);
-};
-
-std::string MapManager::selectNameMap(int size_list)
-{
-    mvwprintw(this->main_win, size_list + 5, 2, "%s %s", "Input map name and",
-	                                                     "press enter: ");
-	curs_set(TRUE);
-	nocbreak();
-	echo();
-	char str[30];
-	wgetstr(this->main_win, str);
-	noecho();
-	cbreak();
-	curs_set(FALSE);
-	return std::string(str);
-};
-
-std::string MapManager::selectMap()
+int MapManager::selectMap(std::vector<std::vector<char>> *map, std::string *map_name)
 {
 	std::vector<std::string>maps_list = getFilesList(DEFAULT_DIR, MAP_EXTENSION);
 	std::sort(maps_list.begin(), maps_list.end());
@@ -70,12 +33,157 @@ std::string MapManager::selectMap()
 				 		maps_list.push_back(
 							this->selectNameMap(maps_list.size()) + MAP_EXTENSION);
 						cursor = maps_list.size() - 1;
-						this->createMap(maps_list[cursor]);
+						*map = this->createMap(maps_list[cursor]);
+                        *map_name = maps_list[cursor];
+                        return 1;
 						break;
             case 27: return 0;
 		}
 	}
-    return maps_list[cursor];
+    if (!this->readMap(maps_list[cursor], map)) return 0;
+    *map_name = maps_list[cursor];
+    return 1;
+};
+
+std::vector<std::vector<char>> MapManager::createMap(std::string name_map)
+{
+    this->selectSizeMap();
+    std::vector<std::vector<char>> map;
+    this->fillMap(&map);
+    return map;
+};
+
+void MapManager::changeMap(std::vector<std::vector<char>> *map)
+{
+    int command;
+    Cursor cursor(0, Point(1, 1));
+    this->printMap(map, &cursor);
+    this->printUnitsPanel(&cursor);
+    while(this->callbackCreator(command = wgetch(this->main_win), &cursor, map))
+    {
+        this->printMap(map, &cursor);
+        this->printUnitsPanel(&cursor);
+    }
+};
+
+void MapManager::printMap(std::vector<std::vector<char>> *map, Cursor *csr)
+{
+    wclear(this->main_win);
+    for (int i = 0; i < this->sizeY; i++)
+		for (int j = 0; j < this->sizeX; j++)
+            mvwprintw(this->main_win, i, j, "%c", (*map)[i][j]);
+    mvwprintw(this->main_win, csr->xy.y, csr->xy.x, "%c", units_symbols[csr->pos]);
+    wrefresh(this->main_win);
+};
+
+void MapManager::selectSizeMap()
+{
+    int command;
+    do
+    {
+        getmaxyx(stdscr, this->sizeY, this->sizeX);
+        this->sizeX = this->sizeX - INFO_WIN_WIDTH;
+        wclear(this->main_win);
+        mvwprintw(this->main_win, 0, 1, "%s %s %s %s. Current size: x:%d, y:%d",
+                                                     "Change size of the",
+                                                     "terminal to select",
+                                                     "size of the map.",
+                                                     "After press ENTER",
+                                                     this->sizeX, this->sizeY);
+        wrefresh(this->main_win);
+    }
+    while(command = wgetch(this->info_win) != KEY_ENTER1);
+};
+
+void MapManager::moveUnit(Cursor *csr, Point dir)
+{
+    Point tp = csr->xy + dir;
+    if (tp.x != 0 && tp.x != this->sizeX - 1 &&
+        tp.y != 0 && tp.y != this->sizeY - 1)
+        csr->xy = tp;
+};
+
+void MapManager::setUnitInPlace(std::vector<std::vector<char>> *map,
+                                                     Cursor *csr)
+{
+    char symb = units_symbols[csr->pos];
+    if (symb == KNIGHT_SYMBOL || symb == PRINCESS_SYMBOL)
+    {
+        (*map)[csr->xy.y][csr->xy.x] =
+            this->findUnit(map, symb) ? (*map)[csr->xy.y][csr->xy.x] : symb;
+    } else (*map)[csr->xy.y][csr->xy.x] = symb;
+};
+
+int MapManager::findUnit(std::vector<std::vector<char>> *map, char unit_symbol)
+{
+    int is = 0;
+    for (int i = 0; i < this->sizeY; i++)
+		for (int j = 0; j < this->sizeX; j++)
+            if ((*map)[i][j] == unit_symbol) return 1;
+    return 0;
+};
+
+int MapManager::readMap(std::string name_map, std::vector<std::vector<char>> *map)
+{
+    std::ifstream input(DEFAULT_DIR + name_map);
+	input >> this->sizeY >> this->sizeX;
+    char c;
+	for (int i = 0; i < this->sizeY; i++)
+	{
+		std::vector<char> row;
+		for (int j = 0; j < this->sizeX; j++)
+        {
+            input >> c;
+            row.push_back(c);
+        }
+		(*map).push_back(row);
+	}
+    return 1;
+};
+
+void MapManager::writeMap(std::vector<std::vector<char>> *map,
+                              std::string name_map)
+{
+    std::ofstream output(DEFAULT_DIR + name_map);
+    output << this->sizeY << " " << this->sizeX << std::endl;
+    for (int i = 0; i < this->sizeY; i++)
+    {
+		for (int j = 0; j < this->sizeX; j++)
+            output << (*map)[i][j];
+        output << std::endl;
+    }
+    output.close();
+};
+
+void MapManager::writeMap(std::string name_map)
+{
+    std::ofstream output(DEFAULT_DIR + name_map);
+    output << this->sizeY << " " << this->sizeX << std::endl;
+	for (int i = 0; i < this->sizeY; i++)
+    {
+		for (int j = 0; j < this->sizeX; j++)
+        {
+            char out = ((i == 0 || i == this->sizeY - 1) ||
+                        (j == 0 || j == this->sizeX - 1) ?
+                        WALL_SYMBOL : GROUND_SYMBOL);
+            output << out;
+        }
+        output << std::endl;
+    }
+    output.close();
+};
+
+void MapManager::fillMap(std::vector<std::vector<char>> *map)
+{
+    for (int i = 0; i < this->sizeY; i++)
+	{
+		std::vector<char> row;
+		for (int j = 0; j < this->sizeX; j++)
+            row.push_back(((i == 0 || i == this->sizeY - 1) ||
+                           (j == 0 || j == this->sizeX - 1) ?
+                           WALL_SYMBOL : GROUND_SYMBOL));
+		map->push_back(row);
+	}
 };
 
 std::vector<std::string> MapManager::getFilesList(std::string directory,
@@ -89,26 +197,32 @@ std::vector<std::string> MapManager::getFilesList(std::string directory,
 	return files_list;
 };
 
-void MapManager::createMap(std::string name_map)
+std::string MapManager::selectNameMap(int size_list)
 {
-    this->selectSizeMap();
-    std::vector<std::vector<char>> map;
-    this->fillMap(&map);
-    int command;
-    Cursor cursor(0, Point(1, 1));
-    this->printMap(&map, &cursor);
-    this->printUnitsPanel(&cursor);
-    while(this->callbackCreator(command = wgetch(this->main_win), &cursor, &map))
-    {
-        this->printMap(&map, &cursor);
-        this->printUnitsPanel(&cursor);
-    }
-    this->writeMap(&map, name_map);
+    mvwprintw(this->main_win, size_list + 5, 2, "%s %s", "Input map name and",
+	                                                     "press enter: ");
+	curs_set(TRUE);
+	nocbreak();
+	echo();
+	char str[30];
+	wgetstr(this->main_win, str);
+	noecho();
+	cbreak();
+	curs_set(FALSE);
+	return std::string(str);
 };
 
-void MapManager::calcUnitsCount(std::vector<std::vector<char>> *map)
+void MapManager::printMenuMap(std::vector<std::string>maps_list, int csr)
 {
-
+	wclear(this->main_win);
+	mvwprintw(this->main_win, 1, 2, "%s %s", "Select map for editing or press n",
+											 "for create new map:");
+	for (int i = 0; i < maps_list.size(); i++)
+	{
+		std::string str = (i == csr ? maps_list[i] + CURSOR : maps_list[i]);
+		mvwprintw(this->main_win, i + 3, 5, "%s", str.c_str());
+	}
+	wrefresh(this->main_win);
 };
 
 void MapManager::printUnitsPanel(Cursor *csr)
@@ -143,127 +257,14 @@ int MapManager::callbackCreator(int command, Cursor *csr,
     return 1;
 };
 
-void MapManager::moveUnit(Cursor *csr, Point dir)
+MapManager& MapManager::instance()
 {
-    Point tp = csr->xy + dir;
-    if (tp.x != 0 && tp.x != this->sizeX - 1 &&
-        tp.y != 0 && tp.y != this->sizeY - 1)
-        csr->xy = tp;
+    static MapManager manager;
+	return manager;
 };
 
-void MapManager::setUnitInPlace(std::vector<std::vector<char>> *map,
-                                                     Cursor *csr)
+void MapManager::initialize(WINDOW* win1, WINDOW* win2)
 {
-    char symb = units_symbols[csr->pos];
-    if (symb == KNIGHT_SYMBOL || symb == PRINCESS_SYMBOL)
-    {
-        (*map)[csr->xy.y][csr->xy.x] =
-            this->findUnit(map, symb) ? (*map)[csr->xy.y][csr->xy.x] : symb;
-    } else (*map)[csr->xy.y][csr->xy.x] = symb;
-};
-
-int MapManager::findUnit(std::vector<std::vector<char>> *map, char unit_symbol)
-{
-    int is = 0;
-    for (int i = 0; i < this->sizeY; i++)
-		for (int j = 0; j < this->sizeX; j++)
-            if ((*map)[i][j] == unit_symbol) return 1;
-    return 0;
-};
-
-void MapManager::fillMap(std::vector<std::vector<char>> *map)
-{
-    for (int i = 0; i < this->sizeY; i++)
-	{
-		std::vector<char> row;
-		for (int j = 0; j < this->sizeX; j++)
-            row.push_back(((i == 0 || i == this->sizeY - 1) ||
-                           (j == 0 || j == this->sizeX - 1) ?
-                           WALL_SYMBOL : GROUND_SYMBOL));
-		map->push_back(row);
-	}
-};
-
-void MapManager::printMap(std::vector<std::vector<char>> *map, Cursor *csr)
-{
-    wclear(this->main_win);
-    for (int i = 0; i < this->sizeY; i++)
-		for (int j = 0; j < this->sizeX; j++)
-            mvwprintw(this->main_win, i, j, "%c", (*map)[i][j]);
-    mvwprintw(this->main_win, csr->xy.y, csr->xy.x, "%c", units_symbols[csr->pos]);
-    wrefresh(this->main_win);
-};
-
-void MapManager::selectSizeMap()
-{
-    int command;
-    do
-    {
-        getmaxyx(stdscr, this->sizeY, this->sizeX);
-        this->sizeX = this->sizeX - INFO_WIN_WIDTH;
-        wclear(this->main_win);
-        mvwprintw(this->main_win, 0, 1, "%s %s %s %s. Current size: x:%d, y:%d",
-                                                     "Change size of the",
-                                                     "terminal to select",
-                                                     "size of the map.",
-                                                     "After press ENTER",
-                                                     this->sizeX, this->sizeY);
-        wrefresh(this->main_win);
-    }
-    while(command = wgetch(this->info_win) != KEY_ENTER1);
-};
-
-void MapManager::changeMap(std::string name_map)
-{
-    std::vector<std::vector<char>> map = this->readMap(name_map);
-};
-
-std::vector<std::vector<char>> MapManager::readMap(std::string name_map)
-{
-    std::ifstream input(name_map);
-    int rows, cols;
-	char c;
-	input >> rows;
-	input >> cols;
-    std::vector<std::vector<char>> map;
-	for (int i = 0; i < rows; i++)
-	{
-		std::vector<char> row;
-		for (int j = 0; j < cols; j++)
-            row.push_back(input.get());
-		map.push_back(row);
-	}
-    return map;
-};
-
-void MapManager::writeMap(std::vector<std::vector<char>> *map,
-                              std::string name_map)
-{
-    std::ofstream output(DEFAULT_DIR + name_map);
-    output << this->sizeX << " " << this->sizeY << std::endl;
-    for (int i = 0; i < this->sizeY; i++)
-    {
-		for (int j = 0; j < this->sizeX; j++)
-            output << (*map)[i][j];
-        output << std::endl;
-    }
-    output.close();
-};
-
-void MapManager::writeMap(std::string name_map)
-{
-    std::ofstream output(DEFAULT_DIR + name_map);
-    output << this->sizeY << " " << this->sizeX << std::endl;
-	for (int i = 0; i < this->sizeY; i++)
-    {
-		for (int j = 0; j < this->sizeX; j++)
-        {
-            char out = ((i == 0 || i == this->sizeY - 1) ||
-                        (j == 0 || j == this->sizeX - 1) ?
-                        WALL_SYMBOL : GROUND_SYMBOL);
-            output << out;
-        }
-        output << std::endl;
-    }
-    output.close();
+    this->main_win = win1;
+    this->info_win = win2;
 };

@@ -31,17 +31,16 @@ public:
     void mapConstruct();
     void printMenuMap(std::vector<std::string>maps_list, int csr);
     std::string selectNameMap(int size_list);
-    std::string selectMap();
+    int selectMap(std::vector<std::vector<char>> *map, std::string *map_name);
     std::vector<std::string> getFilesList(std::string directory,
     									  std::string file_extension);
-    void createMap(std::string name_map);
+    std::vector<std::vector<char>> createMap(std::string name_map);
     void createMap(std::string name_map, int x, int y);
-    void changeMap(std::string name_map);
-    std::vector<std::vector<char>> readMap(std::string name_map);
+    void changeMap(std::vector<std::vector<char>> *map);
+    int readMap(std::string name_map, std::vector<std::vector<char>> *map);
     void selectSizeMap();
     int callbackCreator(int command, Cursor *csr,
                         std::vector<std::vector<char>> *map);
-    void calcUnitsCount(std::vector<std::vector<char>> *map);
     void printMap(std::vector<std::vector<char>> *map, Cursor *csr);
     void moveUnit(Cursor *csr, Point dir);
     void setUnitInPlace(std::vector<std::vector<char>> *map, Cursor *csr);
