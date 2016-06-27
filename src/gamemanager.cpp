@@ -9,7 +9,7 @@ int GameManager::collide(Actor* left, Actor* right)
 	{
 		if (right == this->map.knight) return GAME_LOSE;
 		if (right == this->map.princess) return GAME_WIN;
-		if (right->get_symbol() == BONUS_MEDKIT_COLOR)
+		if (right->get_symbol() == MEDKIT_SYMBOL)
 			this->map.spawns.back()->dec();
 		Point pl = left->get_point();
 		Point pr = right->get_point();
@@ -69,6 +69,9 @@ int GameManager::gameCallback(int key)
 
 void GameManager::gameLoop()
 {
+	std::string map_name;
+	if (!MapManager::instance().selectMap(&map_name)) return;
+	this->mapLoad(map_name);
 	this->selectStartPos();
  	this->generateUnits();
  	this->refreshGrid();
@@ -87,27 +90,17 @@ void GameManager::gameLoop()
 				this->gameEnd(status);
 				break;
 			}
-			this->spawnActions();
+			//this->spawnActions();
 			this->refreshGrid();
 		}
 	}
 };
 
-void GameManager::refreshInfo()
+void GameManager::selectMap()
 {
-	wclear(this->info_win);
-	mvwprintw(this->info_win, 0, 0, "%s", "INFO");
-	mvwprintw(this->info_win, 1, 0, "Health: %d", this->map.knight->get_hp());
-	mvwprintw(this->info_win, 2, 0, "Damage: %d", this->map.knight->get_damage());
-	Point pnt = this->map.knight->get_point();
-	mvwprintw(this->info_win, 3, 0, "Сoordinate: %d %d", pnt.y, pnt.x);
-	mvwprintw(this->info_win, 4, 0, "Bonuses: %d", this->map.spawns.back()->get_count());
-	wrefresh(this->info_win);
-};
-
-void GameManager::tsizeUpdate()
-{
-	getmaxyx(stdscr, this->tsizeY, this->tsizeX);
+	int command;
+	wclear(this->main_win);
+	wrefresh(this->main_win);
 };
 
 void GameManager::selectStartPos()
@@ -118,8 +111,11 @@ void GameManager::selectStartPos()
  		"After selected press SPACE");
 	wrefresh(this->main_win);
  	wgetch(this->main_win);
-	this->map.knight = new Knight(knight_health, 3, Point(1, 1));
-	this->map.map[1][1] = this->map.knight;
+	if (this->map.knight == NULL)
+	{
+		this->map.knight = new Knight(knight_health, knight_damage, Point(1, 1));
+		this->map.map[1][1] = this->map.knight;
+	}
 	this->refreshGrid();
 	while(1)
 	{
@@ -137,6 +133,7 @@ void GameManager::selectStartPos()
 void GameManager::generateUnits()
 {
 	Point pnt = this->map.knight->get_point();
+	int f = wgetch(this->main_win);
 	while (1)
 	{
 		int xn = rand() % (this->map.rows - 2) + 1;
@@ -149,11 +146,19 @@ void GameManager::generateUnits()
 			break;
 		}
 	}
-	this->map.princess = new Princess(1, 0, pnt);
-	this->map.changeActor(this->map.princess);
+	if (this->map.princess == NULL)
+	{
+		this->map.princess = new Princess(1, 0, pnt);
+		this->map.changeActor(this->map.princess);
+	}
+	if (this->map.wizard == NULL)
+	{
+		this->map.wizard = new Wizard(wizard_health, wizard_health, Point(3, 3));
+		this->map.changeActor(this->map.wizard);
+	}
 	for (int i = 0; i < 15; i++)
 	{
-		Point pnt = this->map.findFreePlace(LEFT_ANG, RIGHT_ANG);
+		pnt = this->map.findFreePlace();
 		this->map.addActor(ZOMBIE_SYMBOL, pnt);
 	}
 	this->map.spawns.push_back(new SpawnHealth(1, health_spawn_timer, Point(0, 0)));
@@ -210,6 +215,7 @@ void GameManager::printMenu()
 	mvwprintw(this->main_win, 4, 3, "%s", "2 - Create/Change map");
 	mvwprintw(this->main_win, 5, 3, "%s", "0 - Exit");
 	wrefresh(this->main_win);
+	wrefresh(this->info_win);
 };
 
 int GameManager::menuCallback(int key)
@@ -234,6 +240,22 @@ void GameManager::refreshGrid()
 {
 	this->map.printMap(this->main_win);
 	this->refreshInfo();
+};
+
+void GameManager::refreshInfo()
+{
+	wclear(this->info_win);
+	mvwprintw(this->info_win, 0, 0, "%s", "INFO");
+	mvwprintw(this->info_win, 1, 0, "Health: %d", this->map.knight->get_hp());
+	mvwprintw(this->info_win, 2, 0, "Damage: %d", this->map.knight->get_damage());
+	Point pnt = this->map.knight->get_point();
+	mvwprintw(this->info_win, 3, 0, "Сoordinate: %d %d", pnt.y, pnt.x);
+	wrefresh(this->info_win);
+};
+
+void GameManager::tsizeUpdate()
+{
+	getmaxyx(stdscr, this->tsizeY, this->tsizeX);
 };
 
 void GameManager::createGrids()
@@ -264,14 +286,14 @@ void GameManager::initConsole()
 	this->tsizeUpdate();
 };
 
-GameManager::GameManager(std::string name_map)
+void GameManager::mapLoad(std::string map_name)
 {
-	this->map = Map(name_map);
+	map = Map(map_name);
 };
 
 GameManager& GameManager::instance()
 {
-	static GameManager manager(DEFAULT_DIR + DEFAULT_MAP_NAME);
+	static GameManager manager;
 	return manager;
 };
 
@@ -286,7 +308,7 @@ void initColorPairs()
 	init_pair(ZOMBIES_SPAWN_COLOR, 0, 2);
 	init_pair(DRAGONS_SPAWN_COLOR, 0, 1);
 	init_pair(WIZARD_COLOR, 7, 4);
-	init_pair(BONUS_MEDKIT_COLOR, 1, 7);
+	init_pair(MEDKIT_COLOR, 1, 7);
 	init_pair(BASE_COLOR, 7, 0);
 };
 /*

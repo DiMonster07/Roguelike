@@ -7,16 +7,16 @@
 
 Map::Map(std::string name_map)
 {
-	std::ifstream input(name_map);
+	std::ifstream input(DEFAULT_DIR + name_map);
 	char c;
-	input >> this->rows;
-	input >> this->cols;
+	input >> this->rows >> this->cols;
 	for (int i = 0; i < this->rows; i++)
 	{
 		std::vector<Actor*> row;
 		for (int j = 0; j < this->cols; j++)
 		{
 			Actor* new_actor;
+			Wizard* wizard;
 			SpawnDragons* new_spawnd;
 			SpawnZombies* new_spawnz;
 			input >> c;
@@ -30,15 +30,44 @@ Map::Map(std::string name_map)
 					new_actor = new Ground(1, Point(i, j));
 					row.push_back(new_actor);
 					break;
+				case KNIGHT_SYMBOL:
+					this->knight = new Knight(knight_health, knight_damage,
+												  Point(i, j));
+					row.push_back(this->knight);
+					break;
+				case PRINCESS_SYMBOL:
+					this->princess = new Princess(princess_health, princess_damage,
+												  Point(i, j));
+					row.push_back(this->princess);
+					break;
+				case ZOMBIE_SYMBOL:
+					new_actor = new Zombie(zombie_health, zombie_damage, Point(i, j));
+					row.push_back(new_actor);
+					break;
+				case DRAGON_SYMBOL:
+					new_actor = new Dragon(dragon_health, dragon_damage,
+										   	 	  Point(i, j));
+					row.push_back(new_actor);
+					break;
+				case WIZARD_SYMBOL:
+					this->wizard = new Wizard(wizard_health, wizard_damage,
+										   		  Point(i, j));
+					row.push_back(this->wizard);
+					break;
+				case MEDKIT_SYMBOL:
+					new_actor = new Medkit(medkit_health, bonus_health_value,
+										   		  Point(i, j));
+					row.push_back(new_actor);
+					break;
 				case DRAGONS_SPAWN_SYMBOL:
 					new_spawnd = new SpawnDragons(60, dragon_spawn_timer,
-						Point(i, j));
+										   		  Point(i, j));
 					this->spawns.push_back(new_spawnd);
 					row.push_back(new_spawnd);
 					break;
 				case ZOMBIES_SPAWN_SYMBOL:
 					new_spawnz = new SpawnZombies(30, zombies_spawn_timer,
-						Point(i, j));
+										   		  Point(i, j));
 					this->spawns.push_back(new_spawnz);
 					row.push_back(new_spawnz);
 					break;
@@ -64,16 +93,41 @@ Point Map::findFreePlace(Point lp, Point rp)
 		}
 };
 
+Point Map::findFreePlace()
+{
+	int c = 0;
+	Point lp(1, 1); Point rp(this->rows - 2, this->cols - 2);
+	for (int i = lp.x; i <= rp.x; i++)
+		for (int j = lp.y; j <= rp.y; j++)
+			if (this->map[i][j]->get_symbol() == GROUND_SYMBOL) c++;
+	int num = rand() % c + 1;
+	c = 0;
+	for (int i = lp.x; i <= rp.x; i++)
+		for (int j = lp.y; j <= rp.y; j++)
+		{
+			if (this->map[i][j]->get_symbol() == GROUND_SYMBOL) c++;
+			if (c == num) return this->map[i][j]->get_point();
+		}
+};
+
+Point Map::get_right_ang()
+{
+	return Point(this->cols - 2, this->rows - 2);
+};
+
 void Map::addActor(char c, Point p)
 {
 	 switch(c)
 	 {
 	 	case ZOMBIE_SYMBOL:
-			this->actors.push_back(new Zombie(4, 2, p)); break;
+			this->actors.push_back(new Zombie(zombie_health, zombie_damage, p));
+																	  break;
 	 	case DRAGON_SYMBOL:
-			this->actors.push_back(new Dragon(70, 25, p)); break;
-		case BONUS_MEDKIT_COLOR:
-			this->actors.push_back(new Medkit(1, bonus_health_value, p)); break;
+			this->actors.push_back(new Dragon(dragon_health, dragon_damage, p));
+																	  break;
+		case MEDKIT_COLOR:
+			this->actors.push_back(new Medkit(medkit_health, bonus_health_value, p));
+																	  break;
 	 }
 	 this->changeActor(this->actors[this->actors.size() - 1]);
 };
