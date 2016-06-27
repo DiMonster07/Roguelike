@@ -105,12 +105,12 @@ void Medkit::collide(Wizard* wizard)
 
 int Medkit::get_color()
 {
-	return BONUS_MEDKIT_COLOR;
+	return MEDKIT_COLOR;
 };
 
 char Medkit::get_symbol()
 {
-	return BONUS_MEDKIT_SYMBOL;
+	return MEDKIT_SYMBOL;
 };
 
 int Character::get_damage()
@@ -292,7 +292,7 @@ void SpawnHealth::action(Map& map)
 		{
 			this->count++;
 			Point p = map.findFreePlace(LEFT_ANG, RIGHT_ANG);
-			map.addActor(BONUS_MEDKIT_SYMBOL, p);
+			map.addActor(MEDKIT_SYMBOL, p);
 		}
 		this->timer = health_spawn_timer;
 	}

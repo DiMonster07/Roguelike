@@ -9,7 +9,7 @@ int GameManager::collide(Actor* left, Actor* right)
 	{
 		if (right == this->map.knight) return GAME_LOSE;
 		if (right == this->map.princess) return GAME_WIN;
-		if (right->get_symbol() == BONUS_MEDKIT_COLOR)
+		if (right->get_symbol() == MEDKIT_SYMBOL)
 			this->map.spawns.back()->dec();
 		Point pl = left->get_point();
 		Point pr = right->get_point();
@@ -105,13 +105,18 @@ void GameManager::refreshInfo()
 	wrefresh(this->info_win);
 };
 
+void GameManager::tsizeUpdate()
+{
+	getmaxyx(stdscr, this->tsizeY, this->tsizeX);
+};
+
 void GameManager::selectStartPos()
 {
 	wclear(this->main_win);
 	mvwprintw(this->main_win, 0, 1, "%s\n %s",
  		"Please, select you start position.",
  		"After selected press SPACE");
-		wrefresh(this->main_win);
+	wrefresh(this->main_win);
  	wgetch(this->main_win);
 	this->map.knight = new Knight(knight_health, 3, Point(1, 1));
 	this->map.map[1][1] = this->map.knight;
@@ -205,6 +210,7 @@ void GameManager::printMenu()
 	mvwprintw(this->main_win, 4, 3, "%s", "2 - Create/Change map");
 	mvwprintw(this->main_win, 5, 3, "%s", "0 - Exit");
 	wrefresh(this->main_win);
+	wrefresh(this->info_win);
 };
 
 int GameManager::menuCallback(int key)
@@ -233,8 +239,10 @@ void GameManager::refreshGrid()
 
 void GameManager::createGrids()
 {
-	this->main_win = newwin(30, 60, 0, 0);
-	this->info_win = newwin(30, 20, 0, 61);
+	this->tsizeUpdate();
+	this->main_win = newwin(this->tsizeY, this->tsizeX - INFO_WIN_WIDTH, 0, 0);
+	this->info_win = newwin(this->tsizeY, INFO_WIN_WIDTH, 0, this->tsizeX -
+															 INFO_WIN_WIDTH + 1);
 	keypad(this->main_win, TRUE);
 };
 
@@ -254,6 +262,7 @@ void GameManager::initConsole()
 	initColorPairs();
 	clear();
 	srand(time(0));
+	this->tsizeUpdate();
 };
 
 GameManager::GameManager(std::string name_map)
@@ -278,7 +287,7 @@ void initColorPairs()
 	init_pair(ZOMBIES_SPAWN_COLOR, 0, 2);
 	init_pair(DRAGONS_SPAWN_COLOR, 0, 1);
 	init_pair(WIZARD_COLOR, 7, 4);
-	init_pair(BONUS_MEDKIT_COLOR, 1, 7);
+	init_pair(MEDKIT_COLOR, 1, 7);
 	init_pair(BASE_COLOR, 7, 0);
 };
 /*
