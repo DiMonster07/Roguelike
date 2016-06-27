@@ -4,10 +4,42 @@ using namespace boost::filesystem;
 
 void MapManager::mapConstruct()
 {
+<<<<<<< HEAD
     std::vector<std::vector<char>> map;
     std::string map_name;
     if (this->selectMap(&map, &map_name)) this->changeMap(&map);
     this->writeMap(&map, map_name);
+=======
+    std::string name_map = this->selectMap();
+};
+
+void MapManager::printMenuMap(std::vector<std::string>maps_list, int cursor)
+{
+	wclear(this->main_win);
+	mvwprintw(this->main_win, 1, 2, "%s %s", "Select map for editing or press n",
+											 "for create new map:");
+	for (int i = 0; i < maps_list.size(); i++)
+	{
+		std::string str = (i == cursor ? maps_list[i] + CURSOR : maps_list[i]);
+		mvwprintw(this->main_win, i + 3, 5, "%s", str.c_str());
+	}
+	wrefresh(this->main_win);
+};
+
+std::string MapManager::selectNameMap(int size_list)
+{
+    mvwprintw(this->main_win, size_list + 5, 2, "%s %s", "Input map name and",
+	                                                     "press enter: ");
+	curs_set(TRUE);
+	nocbreak();
+	echo();
+	char str[30];
+	wgetstr(this->main_win, str);
+	noecho();
+	cbreak();
+	curs_set(FALSE);
+	return std::string(str);
+>>>>>>> d40d1754a218ccb451970f1c07c4610067623d2f
 };
 
 int MapManager::selectMap(std::vector<std::vector<char>> *map, std::string *map_name)
@@ -40,9 +72,13 @@ int MapManager::selectMap(std::vector<std::vector<char>> *map, std::string *map_
             case 27: return 0;
 		}
 	}
+<<<<<<< HEAD
     if (!this->readMap(maps_list[cursor], map)) return 0;
     *map_name = maps_list[cursor];
     return 1;
+=======
+    return maps_list[cursor];
+>>>>>>> d40d1754a218ccb451970f1c07c4610067623d2f
 };
 
 std::vector<std::vector<char>> MapManager::createMap(std::string name_map)
@@ -157,6 +193,7 @@ void MapManager::writeMap(std::vector<std::vector<char>> *map,
 
 void MapManager::writeMap(std::string name_map)
 {
+<<<<<<< HEAD
     std::ofstream output(DEFAULT_DIR + name_map);
     output << this->sizeY << " " << this->sizeX << std::endl;
 	for (int i = 0; i < this->sizeY; i++)
@@ -169,8 +206,60 @@ void MapManager::writeMap(std::string name_map)
             output << out;
         }
         output << std::endl;
+=======
+    int sizeX, sizeY;
+    this->selectSizeMap(&sizeX, &sizeY);
+    std::vector<std::vector<char>> map;
+    this->fillMap(&map, sizeX, sizeY);
+    int command;
+    do
+    {
+        this->printMap(&map, sizeX, sizeY);
+>>>>>>> d40d1754a218ccb451970f1c07c4610067623d2f
     }
-    output.close();
+    while(command = wgetch(this->main_win) != KEY_SPACE);
+    this->writeMap(&map, name_map);
+};
+
+void MapManager::fillMap(std::vector<std::vector<char>> *map, int sizeX, int sizeY)
+{
+    for (int i = 0; i < sizeY; i++)
+	{
+		std::vector<char> row;
+		for (int j = 0; j < sizeX; j++)
+            row.push_back(((i == 0 || i == sizeY - 1) ||
+                           (j == 0 || j == sizeX - 1) ?
+                           WALL_SYMBOL : GROUND_SYMBOL));
+		map->push_back(row);
+	}
+};
+
+void MapManager::printMap(std::vector<std::vector<char>> *map, int sizeX, int sizeY)
+{
+    wclear(this->main_win);
+    for (int i = 0; i < sizeY; i++)
+		for (int j = 0; j < sizeX; j++)
+            mvwprintw(this->main_win, i, j, "%c", (*map)[i][j]);
+    wrefresh(this->main_win);
+};
+
+void MapManager::selectSizeMap(int *sizeX, int *sizeY)
+{
+    int command;
+    do
+    {
+        getmaxyx(stdscr, *sizeY, *sizeX);
+        *sizeX = *sizeX - INFO_WIN_WIDTH;
+        wclear(this->main_win);
+        mvwprintw(this->main_win, 0, 1, "%s %s %s %s. Current size: x:%d, y:%d",
+                                                     "Change size of the",
+                                                     "terminal to select",
+                                                     "size of the map.",
+                                                     "After press SPACE",
+                                                     *sizeX, *sizeY);
+        wrefresh(this->main_win);
+    }
+    while(command = wgetch(this->info_win) != KEY_SPACE);
 };
 
 void MapManager::fillMap(std::vector<std::vector<char>> *map)
@@ -225,7 +314,12 @@ void MapManager::printMenuMap(std::vector<std::string>maps_list, int csr)
 	wrefresh(this->main_win);
 };
 
+<<<<<<< HEAD
 void MapManager::printUnitsPanel(Cursor *csr)
+=======
+void MapManager::writeMap(std::vector<std::vector<char>> *map,
+                              std::string name_map)
+>>>>>>> d40d1754a218ccb451970f1c07c4610067623d2f
 {
     wclear(this->info_win);
     for (int i = 0; i < UNITS_COUNT; i++)
@@ -267,4 +361,22 @@ void MapManager::initialize(WINDOW* win1, WINDOW* win2)
 {
     this->main_win = win1;
     this->info_win = win2;
+};
+
+void MapManager::writeMap(std::string name_map, int sizeX, int sizeY)
+{
+    std::ofstream output(DEFAULT_DIR + name_map);
+    output << sizeY << " " << sizeX << std::endl;
+	for (int i = 0; i < sizeY; i++)
+    {
+		for (int j = 0; j < sizeX; j++)
+        {
+            char out = ((i == 0 || i == sizeY - 1) ||
+                        (j == 0 || j == sizeX - 1) ?
+                        WALL_SYMBOL : GROUND_SYMBOL);
+            output << out;
+        }
+        output << std::endl;
+    }
+    output.close();
 };

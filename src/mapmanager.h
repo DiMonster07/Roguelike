@@ -34,6 +34,7 @@ public:
     int selectMap(std::vector<std::vector<char>> *map, std::string *map_name);
     std::vector<std::string> getFilesList(std::string directory,
     									  std::string file_extension);
+<<<<<<< HEAD
     std::vector<std::vector<char>> createMap(std::string name_map);
     void createMap(std::string name_map, int x, int y);
     void changeMap(std::vector<std::vector<char>> *map);
@@ -49,4 +50,15 @@ public:
     void fillMap(std::vector<std::vector<char>> *map);
     void writeMap(std::vector<std::vector<char>> *map, std::string name_map);
     void writeMap(std::string name_map);
+=======
+    void createMap(std::string name_map);
+    void createMap(std::string name_map, int x, int y);
+    void changeMap(std::string name_map);
+    std::vector<std::vector<char>> readMap(std::string name_map);
+    void selectSizeMap(int *sizeX, int *sizeY);
+    void fillMap(std::vector<std::vector<char>> *map, int sizeX, int sizeY);
+    void writeMap(std::vector<std::vector<char>> *map, std::string name_map);
+    void writeMap(std::string name_map, int sizeX, int sizeY);
+    void printMap(std::vector<std::vector<char>> *map, int sizeX, int sizeY);
+>>>>>>> d40d1754a218ccb451970f1c07c4610067623d2f
 };
