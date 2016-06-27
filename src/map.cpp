@@ -123,17 +123,11 @@ void Map::addActor(char c, Point p)
 			this->actors.push_back(new Zombie(zombie_health, zombie_damage, p));
 																	  break;
 	 	case DRAGON_SYMBOL:
-<<<<<<< HEAD
 			this->actors.push_back(new Dragon(dragon_health, dragon_damage, p));
 																	  break;
 		case MEDKIT_COLOR:
 			this->actors.push_back(new Medkit(medkit_health, bonus_health_value, p));
 																	  break;
-=======
-			this->actors.push_back(new Dragon(70, 25, p)); break;
-		case MEDKIT_COLOR:
-			this->actors.push_back(new Medkit(1, bonus_health_value, p)); break;
->>>>>>> 6d54c21a10ac0b6a9a25390aa74bc29c7fad71b7
 	 }
 	 this->changeActor(this->actors[this->actors.size() - 1]);
 };

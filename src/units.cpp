@@ -291,11 +291,7 @@ void SpawnHealth::action(Map& map)
 		if(this->count < 5)
 		{
 			this->count++;
-<<<<<<< HEAD
 			Point p = map.findFreePlace();
-=======
-			Point p = map.findFreePlace(LEFT_ANG, RIGHT_ANG);
->>>>>>> 6d54c21a10ac0b6a9a25390aa74bc29c7fad71b7
 			map.addActor(MEDKIT_SYMBOL, p);
 		}
 		this->timer = health_spawn_timer;

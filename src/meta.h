@@ -95,11 +95,7 @@ static std::map<Point, char> FIREBALL_DIR_SYMBOL =
 };
 
 static char units_symbols[UNITS_COUNT] =
-<<<<<<< HEAD
 	{ '#', '.', 'K', 'P', 'Z', 'D', '@', '%', 'W', '+' };
-=======
-	{ '.', '#', 'K', 'P', 'Z', 'D', '@', '%', 'W', '+' };
->>>>>>> 6d54c21a10ac0b6a9a25390aa74bc29c7fad71b7
 
 static std::map<char, std::string> units_name =
 {
