@@ -32,87 +32,6 @@ bool Actor::is_die()
 	return this->get_hp() > 0 ? false : true;
 };
 
-int Object::get_value()
-{
-	return this->value;
-};
-
-void Fireball::collide(Actor* actor)
-{
-	actor->collide(this);
-};
-
-void Fireball::collide(Knight* knight)
-{
-	this->set_hp(this->get_hp() - knight->get_damage());
-	knight->set_hp(knight->get_hp() - this->get_value());
-};
-
-void Fireball::collide(Monster* monster)
-{
-	this->set_hp(this->get_hp() - monster->get_damage());
-	monster->set_hp(monster->get_hp() - this->get_value());
-};
-
-void Fireball::collide(Wizard* wizard)
-{
-	this->set_hp(this->get_hp() - wizard->get_damage());
-	wizard->set_hp(wizard->get_hp() - this->get_value());
-};
-
-Point Fireball::get_direction()
-{
-	return this->direction;
-};
-
-Point Fireball::get_direction(Map& map)
-{
-	return this->direction;
-};
-
-int Fireball::get_color()
-{
-	return FIREBALL_COLOR;
-};
-
-char Fireball::get_symbol()
-{
-	return FIREBALL_DIR_SYMBOL[this->get_direction()];
-};
-
-void Medkit::collide(Actor* actor)
-{
-	actor->collide(this);
-};
-
-void Medkit::collide(Knight* knight)
-{
-	this->set_hp(this->get_hp() - knight->get_damage());
-	knight->set_hp(knight->get_hp() + this->get_value());
-};
-
-void Medkit::collide(Monster* monster)
-{
-	this->set_hp(this->get_hp() - monster->get_damage());
-	monster->set_hp(monster->get_hp() + this->get_value());
-};
-
-void Medkit::collide(Wizard* wizard)
-{
-	this->set_hp(this->get_hp() - wizard->get_damage());
-	wizard->set_hp(wizard->get_hp() + this->get_value());
-};
-
-int Medkit::get_color()
-{
-	return MEDKIT_COLOR;
-};
-
-char Medkit::get_symbol()
-{
-	return MEDKIT_SYMBOL;
-};
-
 int Character::get_damage()
 {
 	return this->damage;
@@ -126,11 +45,6 @@ void Knight::collide(Actor* actor)
 void Knight::collide(Monster *monster)
 {
 	this->set_hp(this->get_hp() - monster->get_damage());
-};
-
-void Knight::collide(Wizard *wizard)
-{
-	this->set_hp(this->get_hp() - wizard->get_damage());
 };
 
 char Knight::get_symbol()
@@ -198,32 +112,6 @@ int Dragon::get_color()
 	return DRAGON_COLOR;
 };
 
-void Wizard::action(Map& map)
-{
-	Point dir = this->get_direction(map);
-	this->createFireball(map, dir);
-};
-
-Point Wizard::get_direction(Map& map)
-{
-
-};
-
-void Wizard::createFireball(Map& map, Point direction)
-{
-
-};
-
-char Wizard::get_symbol()
-{
-	return WIZARD_SYMBOL;
-};
-
-int Wizard::get_color()
-{
-	return WIZARD_COLOR;
-};
-
 void Ground::collide(Actor *actor)
 {
 	actor->collide(this);
@@ -289,28 +177,14 @@ int Spawn::get_count()
 	return this->count;
 };
 
-void SpawnMedkit::action(Map& map)
-{
-	if(this->timer-- == 0)
-	{
-		if(this->count < 5)
-		{
-			this->count++;
-			Point p = map.findFreePlace();
-			//map.addActor(MEDKIT_SYMBOL, p);
-		}
-		this->timer = medkit_spawn_timer;
-	}
-};
-
 void SpawnZombies::action(Map& map)
 {
 	Point my_p = this->get_point();
 	if (this->timer-- == 0)
 	{
-		Point p = map.findFreePlace(my_p - spawn_range, my_p + spawn_range);
-		map.addActor(ZOMBIE_SYMBOL, p);
-		this->timer = zombies_spawn_timer;
+		// Point p = map.findFreePlace(my_p - spawn_range, my_p + spawn_range);
+		// map.addActor(ZOMBIE_SYMBOL, p);
+		// this->timer = zombies_spawn_timer;
 	}
 };
 

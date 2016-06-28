@@ -24,5 +24,6 @@ public:
 	Point findFreePlace(Point lp, Point rp);
 	void addActor(char c, Point p);
 	Point get_right_ang();
+	Point pointValidation(Point p, int side);
 	void printMap(WINDOW *win);
 };

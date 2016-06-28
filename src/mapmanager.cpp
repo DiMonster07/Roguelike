@@ -95,22 +95,8 @@ void MapManager::changeMap(std::vector<std::vector<char>> *map)
     {
         this->printMap(map, &cursor);
         this->printUnitsPanel(&cursor);
+        usleep(30000);
     }
-};
-
-void MapManager::printMap(std::vector<std::vector<char>> *map, Cursor *csr)
-{
-    wclear(this->main_win);
-    for (int i = 0; i < this->sizeY; i++)
-		for (int j = 0; j < this->sizeX; j++)
-        {
-            wattron(this->main_win, COLOR_PAIR(units_color[(*map)[i][j]]));
-            mvwprintw(this->main_win, i, j, "%c", (*map)[i][j]);
-        }
-    wattron(this->main_win, COLOR_PAIR(units_color[units_symbols[csr->pos]]));
-    mvwprintw(this->main_win, csr->xy.y, csr->xy.x, "%c", units_symbols[csr->pos]);
-    wrefresh(this->main_win);
-    wattron(this->main_win, COLOR_PAIR(BASE_COLOR));
 };
 
 void MapManager::selectSizeMap()
@@ -176,6 +162,21 @@ int MapManager::readMap(std::string name_map, std::vector<std::vector<char>> *ma
 		(*map).push_back(row);
 	}
     return 1;
+};
+
+void MapManager::printMap(std::vector<std::vector<char>> *map, Cursor *csr)
+{
+    wclear(this->main_win);
+    for (int i = 0; i < this->sizeY; i++)
+		for (int j = 0; j < this->sizeX; j++)
+        {
+            wattron(this->main_win, COLOR_PAIR(units_color[(*map)[i][j]]));
+            mvwprintw(this->main_win, i, j, "%c", (*map)[i][j]);
+        }
+    wattron(this->main_win, COLOR_PAIR(units_color[units_symbols[csr->pos]]));
+    mvwprintw(this->main_win, csr->xy.y, csr->xy.x, "%c", units_symbols[csr->pos]);
+    wrefresh(this->main_win);
+    wattron(this->main_win, COLOR_PAIR(BASE_COLOR));
 };
 
 void MapManager::writeMap(std::vector<std::vector<char>> *map,

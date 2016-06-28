@@ -17,6 +17,8 @@
 #define MEDKIT_SYMBOL '+'
 #define CURSOR std::string(" <-")
 
+#define LEFT_SIDE 0
+#define RIGHT_SIDE 1
 #define UNITS_COUNT 10
 
 #define DEFAULT_DIR std::string("../src/maps/")
@@ -53,7 +55,7 @@ const int att_range = 1;
 const int wizard_timer = 3;
 const int spawn_range = 10;
 const int zombies_spawn_timer = 10;
-const int dragon_spawn_timer = 20;
+const int dragon_spawn_timer = 5;
 const int medkit_spawn_timer = 3;
 const int medkit_health_value = 10;
 const int knight_health = 300;
@@ -75,7 +77,6 @@ class Princess;
 class Dragon;
 class Monster;
 class Zombie;
-class Wizard;
 class Environment;
 class Wall;
 class Ground;
@@ -83,8 +84,9 @@ class Spawn;
 class SpawnDragons;
 class SpawnZombies;
 class Object;
-class Medkit;
 class Map;
+// class Wizard;
+// class Medkit;
 
 static std::map<Point, char> FIREBALL_DIR_SYMBOL =
 {
@@ -95,7 +97,7 @@ static std::map<Point, char> FIREBALL_DIR_SYMBOL =
 };
 
 static char units_symbols[UNITS_COUNT] =
-	{ '#', '.', 'K', 'P', 'Z', 'D', '@', '%', 'W', '+' };
+	{ '#', '.', 'K', 'P', 'Z', 'D', '@', '%' };//, 'W', '+' };
 
 static std::map<char, std::string> units_name =
 {
@@ -106,9 +108,9 @@ static std::map<char, std::string> units_name =
 	{ ZOMBIE_SYMBOL, std::string("Zombie") },
 	{ DRAGON_SYMBOL, std::string("Dragon") },
 	{ DRAGONS_SPAWN_SYMBOL, std::string("Dragons spawn") },
-	{ ZOMBIES_SPAWN_SYMBOL, std::string("Zombies spawn") },
-	{ WIZARD_SYMBOL, std::string("Wizard") },
-	{ MEDKIT_SYMBOL, std::string("Medkit") },
+	{ ZOMBIES_SPAWN_SYMBOL, std::string("Zombies spawn") }//,
+	// { WIZARD_SYMBOL, std::string("Wizard") },
+	// { MEDKIT_SYMBOL, std::string("Medkit") },
 };
 
 enum COLORS_UNITS
@@ -122,8 +124,8 @@ enum COLORS_UNITS
 	ZOMBIES_SPAWN_COLOR = 7,
 	DRAGONS_SPAWN_COLOR = 8,
 	WIZARD_COLOR = 9,
-	MEDKIT_COLOR = 10,
-	FIREBALL_COLOR = 11,
+	//MEDKIT_COLOR = 10,
+	//FIREBALL_COLOR = 11,
 	BASE_COLOR = 12
 };
 
@@ -136,7 +138,7 @@ static std::map<char, int> units_color =
 	{ ZOMBIE_SYMBOL, ZOMBIE_COLOR },
 	{ DRAGON_SYMBOL, DRAGON_COLOR },
 	{ ZOMBIES_SPAWN_SYMBOL, ZOMBIES_SPAWN_COLOR },
-	{ DRAGONS_SPAWN_SYMBOL, DRAGONS_SPAWN_COLOR },
-	{ WIZARD_SYMBOL, WIZARD_COLOR },
-	{ MEDKIT_SYMBOL, MEDKIT_COLOR }
+	{ DRAGONS_SPAWN_SYMBOL, DRAGONS_SPAWN_COLOR }//,
+	//{ WIZARD_SYMBOL, WIZARD_COLOR },
+	//{ MEDKIT_SYMBOL, MEDKIT_COLOR }
 };

@@ -9,14 +9,12 @@ int GameManager::collide(Actor* left, Actor* right)
 	{
 		if (right == this->map.knight) return GAME_LOSE;
 		if (right == this->map.princess) return GAME_WIN;
-		if (right->get_symbol() == MEDKIT_SYMBOL)
-			this->map.spawns.back()->dec();
 		Point pl = left->get_point();
 		Point pr = right->get_point();
 		this->deleteActor(right);
-		this->map.map[pr.x][pr.y] = left;
-		this->map.map[pr.x][pr.y]->set_point(pr);
-		this->map.map[pl.x][pl.y] = new Ground(1, pl);
+		this->map.map[pr.y][pr.x] = left;
+		this->map.map[pr.y][pr.x]->set_point(pr);
+		this->map.map[pl.y][pl.x] = new Ground(1, pl);
 	}
 	return GAME_CONTINUE;
 };
@@ -25,23 +23,18 @@ int GameManager::actorsActions()
 {
 	for (int i = 0; i < this->map.actors.size(); i++)
 	{
-		if (this->map.actors[i]->get_symbol() != MEDKIT_SYMBOL)
-		{
-			Point direction = this->map.actors[i]->get_direction(this->map);
-			Point p = this->map.actors[i]->get_point() + direction;
-			int status = this->collide(this->map.actors[i], this->map.map[p.x][p.y]);
-			if (this->map.actors[i]->get_symbol() == WIZARD_SYMBOL)
-				this->map.actors[i]->action(this->map);
-			if(status) return status;
-		}
+		Point direction = this->map.actors[i]->get_direction(this->map);
+		Point p = this->map.actors[i]->get_point() + direction;
+		int status = this->collide(this->map.actors[i], this->map.map[p.y][p.x]);
+		if(status) return status;
 	}
 	return GAME_CONTINUE;
 };
 
 void GameManager::spawnActions()
 {
-	for(int i = 0; i < this->map.spawns.size(); i++)
-		this->map.spawns[i]->action(this->map);
+	for(Spawn* s: this->map.spawns)
+		s->action(this->map);
 };
 
 int GameManager::gameCallback(int key)
@@ -51,19 +44,19 @@ int GameManager::gameCallback(int key)
 	{
 		case KEY_UP:
 			return this->collide(this->map.knight,
-				   this->map.map[pnt.x - 1][pnt.y]);
+				   this->map.map[pnt.y - 1][pnt.x]);
 			break;
 		case KEY_DOWN:
 			return this->collide(this->map.knight,
-				   this->map.map[pnt.x + 1][pnt.y]);
+				   this->map.map[pnt.y + 1][pnt.x]);
 			break;
 		case KEY_RIGHT:
 			return this->collide(this->map.knight,
-				   this->map.map[pnt.x][pnt.y + 1]);
+				   this->map.map[pnt.y][pnt.x + 1]);
 			break;
 		case KEY_LEFT:
 			return this->collide(this->map.knight,
-				   this->map.map[pnt.x][pnt.y - 1]);
+				   this->map.map[pnt.y][pnt.x - 1]);
 			break;
 		case 27: return GAME_LOSE;
 	}
@@ -73,8 +66,8 @@ int GameManager::gameCallback(int key)
 void GameManager::gameLoop()
 {
 	std::string map_name;
-	//if (!MapManager::instance().selectMap(&map_name)) return;
-	this->mapLoad(DEFAULT_DIR + DEFAULT_MAP_NAME);//map_name);
+	if (!MapManager::instance().selectMap(&map_name)) return;
+	this->mapLoad(map_name);
 	this->selectStartPos();
  	this->generateUnits();
  	this->refreshGrid();
@@ -93,9 +86,10 @@ void GameManager::gameLoop()
 				this->gameEnd(status);
 				break;
 			}
-			this->spawnActions();
+			//this->spawnActions();
 			this->refreshGrid();
 		}
+		usleep(30000);
 	}
 };
 
@@ -136,11 +130,11 @@ void GameManager::generateUnits()
 	int f = wgetch(this->main_win);
 	while (1)
 	{
-		int xn = rand() % (this->map.rows - 2) + 1;
-		int yn = rand() % (this->map.cols - 2) + 1;
-		if ((abs(pnt.x - xn) >= this->map.rows / 2 - 1) &&
-			(abs(pnt.y - yn) >= this->map.cols / 2 - 1) &&
-			(this->map.map[xn][yn]->get_symbol() == '.'))
+		int xn = rand() % (this->map.cols - 2) + 1;
+		int yn = rand() % (this->map.rows - 2) + 1;
+		if ((abs(pnt.x - xn) >= this->map.cols / 2 - 1) &&
+			(abs(pnt.y - yn) >= this->map.rows / 2 - 1) &&
+			(this->map.map[yn][xn]->get_symbol() == '.'))
 		{
 			pnt = Point(xn, yn);
 			break;
@@ -156,7 +150,7 @@ void GameManager::generateUnits()
 		pnt = this->map.findFreePlace();
 		this->map.addActor(ZOMBIE_SYMBOL, pnt);
 	}
-	this->map.spawns.push_back(new SpawnMedkit(1, medkit_spawn_timer, Point(0, 0)));
+	//this->map.spawns.push_back(new SpawnMedkit(1, medkit_spawn_timer, Point(0, 0)));
 };
 
 void GameManager::deleteActor(Actor *actor)
@@ -244,7 +238,7 @@ void GameManager::refreshInfo()
 	mvwprintw(this->info_win, 1, 0, "Health: %d", this->map.knight->get_hp());
 	mvwprintw(this->info_win, 2, 0, "Damage: %d", this->map.knight->get_damage());
 	Point pnt = this->map.knight->get_point();
-	mvwprintw(this->info_win, 3, 0, "Сoordinate: %d %d", pnt.y, pnt.x);
+	mvwprintw(this->info_win, 3, 0, "Coordinate: %d %d", pnt.y, pnt.x);
 	wrefresh(this->info_win);
 };
 
@@ -302,8 +296,8 @@ void initColorPairs()
 	init_pair(DRAGON_COLOR, 1, 0);
 	init_pair(ZOMBIES_SPAWN_COLOR, 0, 2);
 	init_pair(DRAGONS_SPAWN_COLOR, 0, 1);
-	init_pair(WIZARD_COLOR, 7, 4);
-	init_pair(MEDKIT_COLOR, 1, 7);
+	//init_pair(WIZARD_COLOR, 7, 4);
+	//init_pair(MEDKIT_COLOR, 1, 7);
 	init_pair(BASE_COLOR, 7, 0);
 };
 /*

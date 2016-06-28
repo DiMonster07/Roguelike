@@ -32,50 +32,7 @@ public:
     virtual void collide(Monster* monster) { };
 	virtual void collide(Spawn* spawn) { };
 	virtual void collide(Ground* ground) { };
-	virtual void collide(Medkit* medkit) { };
 	virtual void collide(Wall* wall) { };
-};
-
-class Object: public Actor
-{
-protected:
-	int value;
-public:
-	Object () : value(0), Actor(0, Point()) { };
-	Object (int h, int v, Point p) : value(v), Actor(h, p) { };
-	int get_value();
-};
-
-class Fireball: public Object
-{
-private:
-	Point direction;
-public:
-	Fireball () : Object(0, 0, Point()) { };
-	Fireball (int h, int v, Point p) : Object(h, v, p) { };
-	int get_color();
-	char get_symbol();
-	Point get_direction(Map& map);
-	Point get_direction();
-	void collide(Actor* actor);
-	void collide(Fireball* fireball) { };
-	void collide(Knight* knight);
-	void collide(Monster *monster);
-	void collide(Wizard *wizard);
-};
-
-class Medkit: public Object
-{
-public:
-	Medkit () : Object(0, 0, Point()) { };
-	Medkit (int h, int v, Point p) : Object(h, v, p) { };
-	int get_color();
-	char get_symbol();
-	void collide(Actor* actor);
-	void collide(Medkit* medkit) { };
-	void collide(Knight* knight);
-	void collide(Monster *monster);
-	void collide(Wizard *wizard);
 };
 
 class Character: public Actor
@@ -99,7 +56,6 @@ public:
 	void collide(Actor* actor);
 	void collide(Knight* knight) { };
 	void collide(Monster *monster);
-	void collide(Wizard *wizard);
 };
 
 class Princess: public Character
@@ -112,7 +68,6 @@ public:
 	void collide(Actor* actor);
 	void collide(Knight* knight);
 	void collide(Princess* princess) { };
-	void collide(Wizard *wizard);
 };
 
 class Monster: public Character
@@ -141,20 +96,6 @@ class Dragon: public Monster
 public:
 	Dragon () { };
 	Dragon (int h, int d, Point p) : Monster (h, d, p) { };
-	int get_color();
-	char get_symbol();
-};
-
-class Wizard: public Monster
-{
-private:
-	int timer = wizard_timer;
-public:
-	Wizard () { };
-	Wizard (int h, int d, Point p) : Monster (h, d, p) { };
-	void action(Map &map);
-	void createFireball(Map& map, Point direction);
-	Point get_direction(Map& map);
 	int get_color();
 	char get_symbol();
 };
