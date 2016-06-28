@@ -50,6 +50,18 @@ Map::Map(std::string name_map)
 					this->actors.push_back(new_actor);
 					row.push_back(new_actor);
 					break;
+				case WIZARD_SYMBOL:
+					new_actor = new Wizard(wizard_health, wizard_damage,
+										   	 	  Point(j, i));
+					this->actors.push_back(new_actor);
+					row.push_back(new_actor);
+					break;
+				case MEDKIT_SYMBOL:
+					new_actor = new Medkit(medkit_health, medkit_health_value,
+										   	 	  Point(j, i));
+					this->actors.push_back(new_actor);
+					row.push_back(new_actor);
+					break;
 				case DRAGONS_SPAWN_SYMBOL:
 					new_spawnd = new SpawnDragons(60, dragon_spawn_timer,
 										   		  Point(j, i));
@@ -118,6 +130,14 @@ Point Map::findFreePlace()
 		}
 };
 
+int Map::getActorsCount(char type_actor)
+{
+	int c = 0;
+	for(Actor* actor: actors)
+		if(actor->get_symbol() == type_actor) c++;
+	return c;
+};
+
 Point Map::get_right_ang()
 {
 	return Point(this->cols - 2, this->rows - 2);
@@ -132,7 +152,19 @@ void Map::addActor(char c, Point p)
 			actor = new Zombie(zombie_health, zombie_damage, p); break;
 		case DRAGON_SYMBOL:
 			actor = new Dragon(dragon_health, dragon_damage, p); break;
+		case MEDKIT_SYMBOL:
+			actor = new Medkit(medkit_health, medkit_health_value, p); break;
 	}
+	this->addActor(actor);
+};
+
+bool Map::isActorTypeInPlace(char c, Point p)
+{
+	return (this->map[p.y][p.x]->get_symbol() == c);
+};
+
+void Map::addActor(Actor* actor)
+{
 	this->actors.push_back(actor);
 	this->changeActor(actor);
 };

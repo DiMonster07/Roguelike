@@ -20,9 +20,12 @@ public:
 	Map(std::string name_map);
 	void changeActor(Actor *actor);
 	void addSpawn();
+	int getActorsCount(char type_actor);
 	Point findFreePlace();
 	Point findFreePlace(Point lp, Point rp);
 	void addActor(char c, Point p);
+	void addActor(Actor* actor);
+	bool isActorTypeInPlace(char c, Point p);
 	Point get_right_ang();
 	Point pointValidation(Point p, int side);
 	void printMap(WINDOW *win);

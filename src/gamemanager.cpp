@@ -5,16 +5,27 @@ void initColorPairs();
 int GameManager::collide(Actor* left, Actor* right)
 {
 	left->collide(right);
+	return this->isActorsDied(left, right);
+};
+
+int GameManager::isActorsDied(Actor* left, Actor* right)
+{
+	Point pl = left->get_point();
+	Point pr = right->get_point();
 	if (right->is_die())
 	{
 		if (right == this->map.knight) return GAME_LOSE;
 		if (right == this->map.princess) return GAME_WIN;
-		Point pl = left->get_point();
-		Point pr = right->get_point();
 		this->deleteActor(right);
 		this->map.map[pr.y][pr.x] = left;
 		this->map.map[pr.y][pr.x]->set_point(pr);
 		this->map.map[pl.y][pl.x] = new Ground(1, pl);
+	}
+	if (left->is_die())
+	{
+		pl = left->get_point();
+		this->map.map[pl.y][pl.x] = new Ground(1, pl);
+		this->deleteActor(left);
 	}
 	return GAME_CONTINUE;
 };
@@ -23,10 +34,15 @@ int GameManager::actorsActions()
 {
 	for (int i = 0; i < this->map.actors.size(); i++)
 	{
-		Point direction = this->map.actors[i]->get_direction(this->map);
-		Point p = this->map.actors[i]->get_point() + direction;
-		int status = this->collide(this->map.actors[i], this->map.map[p.y][p.x]);
-		if(status) return status;
+		if (this->map.actors[i]->get_symbol() != MEDKIT_SYMBOL)
+		{
+			Point direction = this->map.actors[i]->get_direction(this->map);
+			Point p = this->map.actors[i]->get_point() + direction;
+			int status = this->collide(this->map.actors[i], this->map.map[p.y][p.x]);
+			if (status) return status;
+			if (this->map.actors[i]->get_symbol() == WIZARD_SYMBOL)
+				this->map.actors[i]->specialSkill(this->map);
+		}
 	}
 	return GAME_CONTINUE;
 };
@@ -86,7 +102,7 @@ void GameManager::gameLoop()
 				this->gameEnd(status);
 				break;
 			}
-			//this->spawnActions();
+			this->spawnActions();
 			this->refreshGrid();
 		}
 		usleep(30000);
@@ -150,7 +166,7 @@ void GameManager::generateUnits()
 		pnt = this->map.findFreePlace();
 		this->map.addActor(ZOMBIE_SYMBOL, pnt);
 	}
-	//this->map.spawns.push_back(new SpawnMedkit(1, medkit_spawn_timer, Point(0, 0)));
+	this->map.spawns.push_back(new SpawnMedkit(1, medkit_spawn_timer, Point(0, 0)));
 };
 
 void GameManager::deleteActor(Actor *actor)
@@ -163,7 +179,6 @@ void GameManager::deleteActor(Actor *actor)
 			break;
 		}
 	}
-	delete actor;
 };
 
 void GameManager::gameEnd(int status)
@@ -239,6 +254,7 @@ void GameManager::refreshInfo()
 	mvwprintw(this->info_win, 2, 0, "Damage: %d", this->map.knight->get_damage());
 	Point pnt = this->map.knight->get_point();
 	mvwprintw(this->info_win, 3, 0, "Coordinate: %d %d", pnt.y, pnt.x);
+	mvwprintw(this->info_win, 4, 0, "Medkits: %d", this->map.getActorsCount(MEDKIT_SYMBOL));
 	wrefresh(this->info_win);
 };
 
@@ -296,8 +312,9 @@ void initColorPairs()
 	init_pair(DRAGON_COLOR, 1, 0);
 	init_pair(ZOMBIES_SPAWN_COLOR, 0, 2);
 	init_pair(DRAGONS_SPAWN_COLOR, 0, 1);
-	//init_pair(WIZARD_COLOR, 7, 4);
-	//init_pair(MEDKIT_COLOR, 1, 7);
+	init_pair(MEDKIT_COLOR, 1, 7);
+	init_pair(WIZARD_COLOR, 7, 4);
+	init_pair(FIREBALL_COLOR, 7, 4);
 	init_pair(BASE_COLOR, 7, 0);
 };
 /*

@@ -20,6 +20,7 @@ public:
 	void deleteGrids();
 	void refreshGrid();
 	void tsizeUpdate();
+	int isActorsDied(Actor* left, Actor* right);
 
 	void refreshInfo();
 	int readActorsInfo();

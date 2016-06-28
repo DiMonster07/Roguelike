@@ -307,10 +307,10 @@ int MapManager::callbackCreator(int command, Cursor *csr,
                     break;
         case KEY_S: ++csr->pos == UNITS_COUNT ? csr->pos = 0 : csr->pos;
                     break;
-        case KEY_UP: this->moveUnit(csr, LEFT_DIRECTION); break;
-        case KEY_DOWN: this->moveUnit(csr, RIGHT_DIRECTION); break;
-        case KEY_LEFT: this->moveUnit(csr, UP_DIRECTION); break;
-        case KEY_RIGHT: this->moveUnit(csr, DOWN_DIRECTION); break;
+        case KEY_UP: this->moveUnit(csr, UP_DIRECTION); break;
+        case KEY_DOWN: this->moveUnit(csr, DOWN_DIRECTION); break;
+        case KEY_LEFT: this->moveUnit(csr, LEFT_DIRECTION); break;
+        case KEY_RIGHT: this->moveUnit(csr, RIGHT_DIRECTION); break;
         case KEY_SPACE: this->setUnitInPlace(map, csr); break;
         case KEY_ENTER1: return 0; break;
     }

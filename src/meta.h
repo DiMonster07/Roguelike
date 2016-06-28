@@ -37,10 +37,10 @@
 
 #define LEFT_ANG Point(1, 1)
 
-#define UP_DIRECTION Point(-1, 0)
-#define DOWN_DIRECTION Point(1, 0)
-#define LEFT_DIRECTION Point(0, -1)
-#define RIGHT_DIRECTION Point(0, 1)
+#define UP_DIRECTION Point(0, -1)
+#define DOWN_DIRECTION Point(0, 1)
+#define LEFT_DIRECTION Point(-1, 0)
+#define RIGHT_DIRECTION Point(1, 0)
 
 #define GAME_CONTINUE 0
 #define GAME_LOSE 1
@@ -52,24 +52,28 @@
 
 const int vis_range = 3;
 const int att_range = 1;
-const int wizard_timer = 3;
 const int spawn_range = 10;
+const int medkit_max_count = 5;
+const int medkit_spawn_timer = 5;
+const int dragon_spawn_timer = 20;
 const int zombies_spawn_timer = 10;
-const int dragon_spawn_timer = 5;
-const int medkit_spawn_timer = 3;
-const int medkit_health_value = 10;
-const int knight_health = 300;
-const int zombie_health = 4;
-const int dragon_health = 70;
-const int wizard_health = 70;
-const int princess_health = 1;
-const int zombie_damage = 2;
+const int knight_health = 3000000;
+const int knight_damage = 5;
+const int wizard_timer = 3;
 const int wizard_damage = 2;
+const int wizard_health = 70;
+const int zombie_health = 8;
+const int zombie_damage = 4;
+const int dragon_health = 70;
 const int dragon_damage = 25;
-const int knight_damage = 3;
+const int princess_health = 1;
 const int princess_damage = 0;
 const int medkit_health = 1;
+const int medkit_health_value = 10;
+const int fireball_health = 1;
+const int fireball_damage = 10;
 
+class Map;
 class Actor;
 class Character;
 class Knight;
@@ -83,10 +87,11 @@ class Ground;
 class Spawn;
 class SpawnDragons;
 class SpawnZombies;
+class SpawnMedkits;
 class Object;
-class Map;
-// class Wizard;
-// class Medkit;
+class Medkit;
+class Wizard;
+class Fireball;
 
 static std::map<Point, char> FIREBALL_DIR_SYMBOL =
 {
@@ -97,7 +102,7 @@ static std::map<Point, char> FIREBALL_DIR_SYMBOL =
 };
 
 static char units_symbols[UNITS_COUNT] =
-	{ '#', '.', 'K', 'P', 'Z', 'D', '@', '%' };//, 'W', '+' };
+	{ '#', '.', 'K', 'P', 'Z', 'D', '@', '%' , '+', 'W' };
 
 static std::map<char, std::string> units_name =
 {
@@ -108,9 +113,9 @@ static std::map<char, std::string> units_name =
 	{ ZOMBIE_SYMBOL, std::string("Zombie") },
 	{ DRAGON_SYMBOL, std::string("Dragon") },
 	{ DRAGONS_SPAWN_SYMBOL, std::string("Dragons spawn") },
-	{ ZOMBIES_SPAWN_SYMBOL, std::string("Zombies spawn") }//,
-	// { WIZARD_SYMBOL, std::string("Wizard") },
-	// { MEDKIT_SYMBOL, std::string("Medkit") },
+	{ ZOMBIES_SPAWN_SYMBOL, std::string("Zombies spawn") },
+	{ MEDKIT_SYMBOL, std::string("Medkit") },
+	{ WIZARD_SYMBOL, std::string("Wizard") },
 };
 
 enum COLORS_UNITS
@@ -124,8 +129,8 @@ enum COLORS_UNITS
 	ZOMBIES_SPAWN_COLOR = 7,
 	DRAGONS_SPAWN_COLOR = 8,
 	WIZARD_COLOR = 9,
-	//MEDKIT_COLOR = 10,
-	//FIREBALL_COLOR = 11,
+	MEDKIT_COLOR = 10,
+	FIREBALL_COLOR = 11,
 	BASE_COLOR = 12
 };
 
@@ -138,7 +143,7 @@ static std::map<char, int> units_color =
 	{ ZOMBIE_SYMBOL, ZOMBIE_COLOR },
 	{ DRAGON_SYMBOL, DRAGON_COLOR },
 	{ ZOMBIES_SPAWN_SYMBOL, ZOMBIES_SPAWN_COLOR },
-	{ DRAGONS_SPAWN_SYMBOL, DRAGONS_SPAWN_COLOR }//,
-	//{ WIZARD_SYMBOL, WIZARD_COLOR },
-	//{ MEDKIT_SYMBOL, MEDKIT_COLOR }
+	{ DRAGONS_SPAWN_SYMBOL, DRAGONS_SPAWN_COLOR },
+	{ MEDKIT_SYMBOL, MEDKIT_COLOR },
+	{ WIZARD_SYMBOL, WIZARD_COLOR }
 };
