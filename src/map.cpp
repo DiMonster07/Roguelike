@@ -42,20 +42,23 @@ Map::Map(std::string name_map)
 					break;
 				case ZOMBIE_SYMBOL:
 					new_actor = new Zombie(zombie_health, zombie_damage, Point(i, j));
+					this->actors.push_back(new_actor);
 					row.push_back(new_actor);
 					break;
 				case DRAGON_SYMBOL:
 					new_actor = new Dragon(dragon_health, dragon_damage,
 										   	 	  Point(i, j));
+					this->actors.push_back(new_actor);
 					row.push_back(new_actor);
 					break;
 				case WIZARD_SYMBOL:
-					this->wizard = new Wizard(wizard_health, wizard_damage,
+					new_actor = new Wizard(wizard_health, wizard_damage,
 										   		  Point(i, j));
-					row.push_back(this->wizard);
+					this->actors.push_back(new_actor);
+					row.push_back(new_actor);
 					break;
 				case MEDKIT_SYMBOL:
-					new_actor = new Medkit(medkit_health, bonus_health_value,
+					new_actor = new Medkit(medkit_health, medkit_health_value,
 										   		  Point(i, j));
 					row.push_back(new_actor);
 					break;
@@ -117,19 +120,19 @@ Point Map::get_right_ang()
 
 void Map::addActor(char c, Point p)
 {
-	 switch(c)
-	 {
-	 	case ZOMBIE_SYMBOL:
-			this->actors.push_back(new Zombie(zombie_health, zombie_damage, p));
-																	  break;
-	 	case DRAGON_SYMBOL:
-			this->actors.push_back(new Dragon(dragon_health, dragon_damage, p));
-																	  break;
+	Actor* actor;
+	switch(c)
+	{
+		case ZOMBIE_SYMBOL:
+			actor = new Zombie(zombie_health, zombie_damage, p); break;
+		case DRAGON_SYMBOL:
+			actor = new Dragon(dragon_health, dragon_damage, p); break;
 		case MEDKIT_COLOR:
-			this->actors.push_back(new Medkit(medkit_health, bonus_health_value, p));
-																	  break;
-	 }
-	 this->changeActor(this->actors[this->actors.size() - 1]);
+			actor = new Medkit(medkit_health, medkit_health_value, p); break;
+	}
+	if(c != MEDKIT_SYMBOL)
+		this->actors.push_back(actor);
+	this->changeActor(actor);
 };
 
 void Map::changeActor(Actor *actor)

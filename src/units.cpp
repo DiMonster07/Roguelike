@@ -204,6 +204,11 @@ void Wizard::action(Map& map)
 	this->createFireball(map, dir);
 };
 
+Point Wizard::get_direction(Map& map)
+{
+
+};
+
 void Wizard::createFireball(Map& map, Point direction)
 {
 
@@ -284,7 +289,7 @@ int Spawn::get_count()
 	return this->count;
 };
 
-void SpawnHealth::action(Map& map)
+void SpawnMedkit::action(Map& map)
 {
 	if(this->timer-- == 0)
 	{
@@ -292,9 +297,9 @@ void SpawnHealth::action(Map& map)
 		{
 			this->count++;
 			Point p = map.findFreePlace();
-			map.addActor(MEDKIT_SYMBOL, p);
+			//map.addActor(MEDKIT_SYMBOL, p);
 		}
-		this->timer = health_spawn_timer;
+		this->timer = medkit_spawn_timer;
 	}
 };
 

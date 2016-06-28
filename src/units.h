@@ -154,6 +154,7 @@ public:
 	Wizard (int h, int d, Point p) : Monster (h, d, p) { };
 	void action(Map &map);
 	void createFireball(Map& map, Point direction);
+	Point get_direction(Map& map);
 	int get_color();
 	char get_symbol();
 };
@@ -205,11 +206,11 @@ public:
 	void collide(Monster *monster) { };
 };
 
-class SpawnHealth: public Spawn
+class SpawnMedkit: public Spawn
 {
 public:
-    SpawnHealth () : Spawn(0, 0, Point()) { };
-    SpawnHealth (int h, int t, Point p) : Spawn(h, t, p) { };
+    SpawnMedkit () : Spawn(0, 0, Point()) { };
+    SpawnMedkit (int h, int t, Point p) : Spawn(h, t, p) { };
 	void action(Map& map);
 };
 

@@ -13,7 +13,6 @@ public:
 	int cols, rows;
 	Knight *knight = NULL;
 	Princess *princess = NULL;
-	Wizard *wizard = NULL;
 	std::vector<Spawn*> spawns;
 	std::vector<Actor*> actors;
 	std::vector<std::vector<Actor*>> map;

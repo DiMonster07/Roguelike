@@ -2,6 +2,7 @@
 
 int main(int argc, char **argv)
 {
+	setlocale (LC_ALL,"");
 	if (!GameManager::instance().readActorsInfo())
 	{
 		GameManager::instance().initConsole();

@@ -25,12 +25,15 @@ int GameManager::actorsActions()
 {
 	for (int i = 0; i < this->map.actors.size(); i++)
 	{
-		Point direction = this->map.actors[i]->get_direction(this->map);
-		Point p = this->map.actors[i]->get_point() + direction;
-		int status = this->collide(this->map.actors[i], this->map.map[p.x][p.y]);
-		if(status) return status;
-		if (this->map.actors[i]->get_symbol() == WIZARD_SYMBOL)
-			this->map.actors[i]->action(this->map);
+		if (this->map.actors[i]->get_symbol() != MEDKIT_SYMBOL)
+		{
+			Point direction = this->map.actors[i]->get_direction(this->map);
+			Point p = this->map.actors[i]->get_point() + direction;
+			int status = this->collide(this->map.actors[i], this->map.map[p.x][p.y]);
+			if (this->map.actors[i]->get_symbol() == WIZARD_SYMBOL)
+				this->map.actors[i]->action(this->map);
+			if(status) return status;
+		}
 	}
 	return GAME_CONTINUE;
 };
@@ -70,8 +73,8 @@ int GameManager::gameCallback(int key)
 void GameManager::gameLoop()
 {
 	std::string map_name;
-	if (!MapManager::instance().selectMap(&map_name)) return;
-	this->mapLoad(map_name);
+	//if (!MapManager::instance().selectMap(&map_name)) return;
+	this->mapLoad(DEFAULT_DIR + DEFAULT_MAP_NAME);//map_name);
 	this->selectStartPos();
  	this->generateUnits();
  	this->refreshGrid();
@@ -90,7 +93,7 @@ void GameManager::gameLoop()
 				this->gameEnd(status);
 				break;
 			}
-			//this->spawnActions();
+			this->spawnActions();
 			this->refreshGrid();
 		}
 	}
@@ -110,7 +113,6 @@ void GameManager::selectStartPos()
  		"Please, select you start position.",
  		"After selected press SPACE");
 	wrefresh(this->main_win);
- 	wgetch(this->main_win);
 	if (this->map.knight == NULL)
 	{
 		this->map.knight = new Knight(knight_health, knight_damage, Point(1, 1));
@@ -126,8 +128,6 @@ void GameManager::selectStartPos()
 	}
 	wrefresh(this->main_win);
 	mvwprintw(this->main_win, 0, 0, "%s", "Please press any key. Good luck!");
-	wgetch(this->main_win);
-	clear();
 };
 
 void GameManager::generateUnits()
@@ -151,17 +151,12 @@ void GameManager::generateUnits()
 		this->map.princess = new Princess(1, 0, pnt);
 		this->map.changeActor(this->map.princess);
 	}
-	if (this->map.wizard == NULL)
-	{
-		this->map.wizard = new Wizard(wizard_health, wizard_health, Point(3, 3));
-		this->map.changeActor(this->map.wizard);
-	}
 	for (int i = 0; i < 15; i++)
 	{
 		pnt = this->map.findFreePlace();
 		this->map.addActor(ZOMBIE_SYMBOL, pnt);
 	}
-	this->map.spawns.push_back(new SpawnHealth(1, health_spawn_timer, Point(0, 0)));
+	this->map.spawns.push_back(new SpawnMedkit(1, medkit_spawn_timer, Point(0, 0)));
 };
 
 void GameManager::deleteActor(Actor *actor)
@@ -206,6 +201,17 @@ void GameManager::menuLoop()
 	}
 };
 
+int GameManager::menuCallback(int key)
+{
+	switch(key)
+	{
+		case GAME_START: this->gameLoop(); break;
+		case CREATE_MAP: MapManager::instance().mapConstruct(); break;
+		case GAME_EXIT: return 0; break;
+	}
+	return 1;
+};
+
 void GameManager::printMenu()
 {
 	wclear(this->info_win);
@@ -216,17 +222,6 @@ void GameManager::printMenu()
 	mvwprintw(this->main_win, 5, 3, "%s", "0 - Exit");
 	wrefresh(this->main_win);
 	wrefresh(this->info_win);
-};
-
-int GameManager::menuCallback(int key)
-{
-	switch(key)
-	{
-		case GAME_START: this->gameLoop(); break;
-		case CREATE_MAP: MapManager::instance().mapConstruct(); break;
-		case GAME_EXIT: return 0; break;
-	}
-	return 1;
 };
 
 int GameManager::readActorsInfo()
