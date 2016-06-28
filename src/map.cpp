@@ -57,7 +57,7 @@ Map::Map(std::string name_map)
 					row.push_back(new_actor);
 					break;
 				case MEDKIT_SYMBOL:
-					new_actor = new Medkit(medkit_health, medkit_health_value,
+					new_actor = new Medkit(medkit_health, medkit_heal_power,
 										   	 	  Point(j, i));
 					this->actors.push_back(new_actor);
 					row.push_back(new_actor);
@@ -153,7 +153,7 @@ void Map::addActor(char c, Point p)
 		case DRAGON_SYMBOL:
 			actor = new Dragon(dragon_health, dragon_damage, p); break;
 		case MEDKIT_SYMBOL:
-			actor = new Medkit(medkit_health, medkit_health_value, p); break;
+			actor = new Medkit(medkit_health, medkit_heal_power, p); break;
 	}
 	this->addActor(actor);
 };

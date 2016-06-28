@@ -233,7 +233,7 @@ public:
 class Medkit: public Object
 {
 public:
-	Medkit() : Object(medkit_health, medkit_health_value, Point()) { };
+	Medkit() : Object(medkit_health, medkit_heal_power, Point()) { };
 	Medkit(int h, int v, Point p) : Object(h, v, p) { };
 	int get_color();
 	char get_symbol();

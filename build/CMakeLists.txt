@@ -9,7 +9,9 @@ set(SOURCE_FILES
     ../src/map.cpp
     ../src/mapmanager.cpp
     ../src/units.cpp
-    ../src/point.cpp)
+    ../src/point.cpp
+    ../src/config.cpp
+    ../src/json_importer.cpp)
 
 add_executable(Roguelike ${SOURCE_FILES})
 target_link_libraries( Roguelike ncurses panel boost_system boost_filesystem)

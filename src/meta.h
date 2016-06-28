@@ -11,10 +11,10 @@
 #define PRINCESS_SYMBOL 'P'
 #define ZOMBIE_SYMBOL 'Z'
 #define DRAGON_SYMBOL 'D'
-#define DRAGONS_SPAWN_SYMBOL '@'
-#define ZOMBIES_SPAWN_SYMBOL '%'
 #define WIZARD_SYMBOL 'W'
 #define MEDKIT_SYMBOL '+'
+#define DRAGONS_SPAWN_SYMBOL '@'
+#define ZOMBIES_SPAWN_SYMBOL '%'
 #define CURSOR std::string(" <-")
 
 #define LEFT_SIDE 0
@@ -69,7 +69,7 @@ const int dragon_damage = 25;
 const int princess_health = 1;
 const int princess_damage = 0;
 const int medkit_health = 1;
-const int medkit_health_value = 10;
+const int medkit_heal_power = 10;
 const int fireball_health = 1;
 const int fireball_damage = 10;
 

@@ -1,14 +1,13 @@
 #include "gamemanager.h"
+#include "config.h"
 
 int main(int argc, char **argv)
 {
-	if (!GameManager::instance().readActorsInfo())
-	{
-		GameManager::instance().initConsole();
-		GameManager::instance().createGrids();
-		GameManager::instance().menuLoop();
-		GameManager::instance().deleteGrids();
-		endwin();
-    };
+	Config::instance().Parse("../src/config.cfg");
+	GameManager::instance().initConsole();
+	GameManager::instance().createGrids();
+	GameManager::instance().menuLoop();
+	GameManager::instance().deleteGrids();
+	endwin();
 	return 0;
 }
