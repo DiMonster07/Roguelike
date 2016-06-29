@@ -22,11 +22,6 @@ int Actor::get_hp()
 	return this->health;
 };
 
-void Actor::set_hp(int value)
-{
-	this->health = value;
-};
-
 bool Actor::is_die()
 {
 	return this->get_hp() > 0 ? false : true;
@@ -35,6 +30,14 @@ bool Actor::is_die()
 int Character::get_damage()
 {
 	return this->damage;
+};
+
+void Knight::set_hp(int value)
+{
+	if (value > Config::instance().get_knight_max_hp())
+		this->health = Config::instance().get_knight_max_hp();
+	else
+		this->health = value;
 };
 
 void Knight::collide(Actor* actor)
@@ -141,6 +144,14 @@ int Fireball::get_color()
 	return FIREBALL_COLOR;
 };
 
+void Zombie::set_hp(int value)
+{
+	if (value > Config::instance().get_zombie_max_hp())
+		this->health = Config::instance().get_zombie_max_hp();
+	else
+		this->health = value;
+};
+
 char Zombie::get_symbol()
 {
 	return Config::instance().get_zombie_symbol();
@@ -151,6 +162,14 @@ int Zombie::get_color()
 	return ZOMBIE_COLOR;
 };
 
+void Dragon::set_hp(int value)
+{
+	if (value > Config::instance().get_dragon_max_hp())
+		this->health = Config::instance().get_dragon_max_hp();
+	else
+		this->health = value;
+};
+
 char Dragon::get_symbol()
 {
 	return Config::instance().get_dragon_symbol();
@@ -159,6 +178,15 @@ char Dragon::get_symbol()
 int Dragon::get_color()
 {
 	return DRAGON_COLOR;
+};
+
+
+void Wizard::set_hp(int value)
+{
+	if (value > Config::instance().get_wizard_max_hp())
+		this->health = Config::instance().get_wizard_max_hp();
+	else
+		this->health = value;
 };
 
 void Wizard::specialSkill(Map& map)

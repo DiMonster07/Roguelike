@@ -20,7 +20,7 @@ public:
 	void set_point(int x, int y);
 	void set_point(Point p);
 	int get_hp();
-	void set_hp(int value);
+	virtual void set_hp(int value) { this->health = value; };
 	bool is_die();
 	virtual int get_color() { };
 	virtual char get_symbol() { };
@@ -58,6 +58,7 @@ public:
 	Knight(int h, int d, Point p) : Character(h, d, p) { };
 	int get_color();
 	char get_symbol();
+	void set_hp(int value);
 	void collide(Actor* actor);
 	void collide(Knight* knight) { };
 	void collide(Monster *monster);
@@ -115,6 +116,7 @@ public:
 	Zombie(int h, int d, Point p) : Monster(h, d, p) { };
 	int get_color();
 	char get_symbol();
+	void set_hp(int value);
 };
 
 class Dragon: public Monster
@@ -124,6 +126,7 @@ public:
 	Dragon(int h, int d, Point p) : Monster(h, d, p) { };
 	int get_color();
 	char get_symbol();
+	void set_hp(int value);
 };
 
 class Wizard: public Monster
@@ -133,6 +136,7 @@ public:
 	Wizard(int h, int d, Point p) : Monster(h, d, p) { };
 	int get_color();
 	char get_symbol();
+	void set_hp(int value);
 	void specialSkill(Map& map);
 };
 

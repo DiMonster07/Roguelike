@@ -26,9 +26,13 @@ public:
 	char get_medkit_symbol() { return MEDKIT_SYMBOL; }
 
 	int get_knight_hp() { return knight_health; }
+    int get_knight_max_hp() { return knight_max_health; }
 	int get_zombie_hp() { return zombie_health; }
+    int get_zombie_max_hp() { return zombie_max_health; }
 	int get_dragon_hp() { return dragon_health; }
+    int get_dragon_max_hp() { return dragon_max_health; }
 	int get_wizard_hp() { return wizard_health; }
+    int get_wizard_max_hp() { return wizard_max_health; }
 	int get_princess_hp() { return princess_health; }
 
 	int get_knight_damage() { return knight_damage; }
@@ -59,6 +63,7 @@ private:
     int
     	knight_health,
     	knight_damage,
+        knight_max_health,
     	princess_health,
     	medkit_heal_power,
     	medkit_max_count,
@@ -68,9 +73,12 @@ private:
     	wizard_timer,
     	wizard_damage,
     	wizard_health,
+        wizard_max_health,
     	zombie_health,
     	zombie_damage,
+        zombie_max_health,
     	dragon_health,
+        dragon_max_health,
     	dragon_damage,
     	fireball_damage;
 };
