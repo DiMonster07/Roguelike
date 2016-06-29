@@ -95,7 +95,7 @@ void MapManager::changeMap(std::vector<std::vector<char>> *map)
     {
         this->printMap(map, &cursor);
         this->printUnitsPanel(&cursor);
-        usleep(30000);
+        usleep(35000);
     }
 };
 
@@ -130,7 +130,8 @@ void MapManager::setUnitInPlace(std::vector<std::vector<char>> *map,
                                                      Cursor *csr)
 {
     char symb = units_symbols[csr->pos];
-    if (symb == KNIGHT_SYMBOL || symb == PRINCESS_SYMBOL)
+    if (symb == Config::instance().get_knight_symbol() ||
+        symb == Config::instance().get_princess_symbol())
     {
         (*map)[csr->xy.y][csr->xy.x] =
             this->findUnit(map, symb) ? (*map)[csr->xy.y][csr->xy.x] : symb;
@@ -166,6 +167,7 @@ int MapManager::readMap(std::string name_map, std::vector<std::vector<char>> *ma
 
 void MapManager::printMap(std::vector<std::vector<char>> *map, Cursor *csr)
 {
+    std::map<char, int> units_color = get_units_color();
     wclear(this->main_win);
     for (int i = 0; i < this->sizeY; i++)
 		for (int j = 0; j < this->sizeX; j++)
@@ -203,7 +205,8 @@ void MapManager::writeMap(std::string name_map)
         {
             char out = ((i == 0 || i == this->sizeY - 1) ||
                         (j == 0 || j == this->sizeX - 1) ?
-                        WALL_SYMBOL : GROUND_SYMBOL);
+                        Config::instance().get_wall_symbol() :
+                        Config::instance().get_ground_symbol());
             output << out;
         }
         output << std::endl;
@@ -217,9 +220,10 @@ void MapManager::fillMap(std::vector<std::vector<char>> *map)
 	{
 		std::vector<char> row;
 		for (int j = 0; j < this->sizeX; j++)
-            row.push_back(((i == 0 || i == this->sizeY - 1) ||
+            row.push_back((i == 0 || i == this->sizeY - 1) ||
                            (j == 0 || j == this->sizeX - 1) ?
-                           WALL_SYMBOL : GROUND_SYMBOL));
+                           Config::instance().get_wall_symbol() :
+                           Config::instance().get_ground_symbol());
 		map->push_back(row);
 	}
 };
@@ -269,7 +273,8 @@ void MapManager::printMenuMap(std::vector<MapInfo>maps_list, int csr)
 	{
         if (sx >= maps_list[i].sx && sy >= maps_list[i].sy)
         {
-    		std::string str = (i == csr ? maps_list[i].name + CURSOR : maps_list[i].name);
+    		std::string str = (i == csr ?
+                               maps_list[i].name + CURSOR : maps_list[i].name);
     		mvwprintw(this->main_win, c + 3, 5, "%s", str.c_str());
             c++;
         }
@@ -285,7 +290,21 @@ void MapManager::printMenuMap(std::vector<MapInfo>maps_list, int csr)
 
 void MapManager::printUnitsPanel(Cursor *csr)
 {
+    std::map<char, std::string> units_name =
+    {
+    	{ Config::instance().get_ground_symbol(),        std::string("Ground") },
+    	{ Config::instance().get_wall_symbol(),          std::string("Wall") },
+    	{ Config::instance().get_knight_symbol(),        std::string("Knight") },
+    	{ Config::instance().get_princess_symbol(),      std::string("Princess") },
+    	{ Config::instance().get_zombie_symbol(),        std::string("Zombie") },
+    	{ Config::instance().get_dragon_symbol(),        std::string("Dragon") },
+    	{ Config::instance().get_dragons_spawn_symbol(), std::string("Dragons spawn") },
+    	{ Config::instance().get_zombies_spawn_symbol(), std::string("Zombies spawn") },
+    	{ Config::instance().get_medkit_symbol(),        std::string("Medkit") },
+    	{ Config::instance().get_wizard_symbol(),        std::string("Wizard") },
+    };
     wclear(this->info_win);
+    std::map<char, int> units_color = get_units_color();
     for (int i = 0; i < UNITS_COUNT; i++)
     {
         std::string str = (i == csr->pos ? units_name[units_symbols[i]] + CURSOR :

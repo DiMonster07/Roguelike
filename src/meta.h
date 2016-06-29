@@ -5,16 +5,6 @@
 #include <ncurses.h>
 #include <panel.h>
 
-#define GROUND_SYMBOL '.'
-#define WALL_SYMBOL '#'
-#define KNIGHT_SYMBOL 'K'
-#define PRINCESS_SYMBOL 'P'
-#define ZOMBIE_SYMBOL 'Z'
-#define DRAGON_SYMBOL 'D'
-#define WIZARD_SYMBOL 'W'
-#define MEDKIT_SYMBOL '+'
-#define DRAGONS_SPAWN_SYMBOL '@'
-#define ZOMBIES_SPAWN_SYMBOL '%'
 #define CURSOR std::string(" <-")
 
 #define LEFT_SIDE 0
@@ -53,25 +43,6 @@
 const int vis_range = 3;
 const int att_range = 1;
 const int spawn_range = 10;
-const int medkit_max_count = 5;
-const int medkit_spawn_timer = 5;
-const int dragon_spawn_timer = 20;
-const int zombies_spawn_timer = 10;
-const int knight_health = 3000000;
-const int knight_damage = 5;
-const int wizard_timer = 3;
-const int wizard_damage = 2;
-const int wizard_health = 70;
-const int zombie_health = 8;
-const int zombie_damage = 4;
-const int dragon_health = 70;
-const int dragon_damage = 25;
-const int princess_health = 1;
-const int princess_damage = 0;
-const int medkit_health = 1;
-const int medkit_heal_power = 10;
-const int fireball_health = 1;
-const int fireball_damage = 10;
 
 class Map;
 class Actor;
@@ -104,20 +75,6 @@ static std::map<Point, char> FIREBALL_DIR_SYMBOL =
 static char units_symbols[UNITS_COUNT] =
 	{ '#', '.', 'K', 'P', 'Z', 'D', '@', '%' , '+', 'W' };
 
-static std::map<char, std::string> units_name =
-{
-	{ GROUND_SYMBOL, std::string("Ground") },
-	{ WALL_SYMBOL, std::string("Wall") },
-	{ KNIGHT_SYMBOL, std::string("Knight") },
-	{ PRINCESS_SYMBOL, std::string("Princess") },
-	{ ZOMBIE_SYMBOL, std::string("Zombie") },
-	{ DRAGON_SYMBOL, std::string("Dragon") },
-	{ DRAGONS_SPAWN_SYMBOL, std::string("Dragons spawn") },
-	{ ZOMBIES_SPAWN_SYMBOL, std::string("Zombies spawn") },
-	{ MEDKIT_SYMBOL, std::string("Medkit") },
-	{ WIZARD_SYMBOL, std::string("Wizard") },
-};
-
 enum COLORS_UNITS
 {
 	WALL_COLOR = 1,
@@ -134,16 +91,4 @@ enum COLORS_UNITS
 	BASE_COLOR = 12
 };
 
-static std::map<char, int> units_color =
-{
-	{ WALL_SYMBOL, WALL_COLOR },
-	{ GROUND_SYMBOL, GROUND_COLOR },
-	{ KNIGHT_SYMBOL, KNIGHT_COLOR },
-	{ PRINCESS_SYMBOL, PRINCESS_COLOR },
-	{ ZOMBIE_SYMBOL, ZOMBIE_COLOR },
-	{ DRAGON_SYMBOL, DRAGON_COLOR },
-	{ ZOMBIES_SPAWN_SYMBOL, ZOMBIES_SPAWN_COLOR },
-	{ DRAGONS_SPAWN_SYMBOL, DRAGONS_SPAWN_COLOR },
-	{ MEDKIT_SYMBOL, MEDKIT_COLOR },
-	{ WIZARD_SYMBOL, WIZARD_COLOR }
-};
+std::map<char, int> get_units_color();

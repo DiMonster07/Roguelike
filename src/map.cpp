@@ -19,61 +19,69 @@ Map::Map(std::string name_map)
 			SpawnDragons* new_spawnd;
 			SpawnZombies* new_spawnz;
 			input >> c;
-			switch(c)
+			if (c == Config::instance().get_wall_symbol())
 			{
-				case WALL_SYMBOL:
-					new_actor = new Wall(3, Point(j, i));
-					row.push_back(new_actor);
-					break;
-				case GROUND_SYMBOL:
-					new_actor = new Ground(1, Point(j, i));
-					row.push_back(new_actor);
-					break;
-				case KNIGHT_SYMBOL:
-					this->knight = new Knight(knight_health, knight_damage,
-												  Point(j, i));
-					row.push_back(this->knight);
-					break;
-				case PRINCESS_SYMBOL:
-					this->princess = new Princess(princess_health, princess_damage,
-												  Point(j, i));
-					row.push_back(this->princess);
-					break;
-				case ZOMBIE_SYMBOL:
-					new_actor = new Zombie(zombie_health, zombie_damage, Point(j, i));
-					this->actors.push_back(new_actor);
-					row.push_back(new_actor);
-					break;
-				case DRAGON_SYMBOL:
-					new_actor = new Dragon(dragon_health, dragon_damage,
-										   	 	  Point(j, i));
-					this->actors.push_back(new_actor);
-					row.push_back(new_actor);
-					break;
-				case WIZARD_SYMBOL:
-					new_actor = new Wizard(wizard_health, wizard_damage,
-										   	 	  Point(j, i));
-					this->actors.push_back(new_actor);
-					row.push_back(new_actor);
-					break;
-				case MEDKIT_SYMBOL:
-					new_actor = new Medkit(medkit_health, medkit_heal_power,
-										   	 	  Point(j, i));
-					this->actors.push_back(new_actor);
-					row.push_back(new_actor);
-					break;
-				case DRAGONS_SPAWN_SYMBOL:
-					new_spawnd = new SpawnDragons(60, dragon_spawn_timer,
-										   		  Point(j, i));
-					this->spawns.push_back(new_spawnd);
-					row.push_back(new_spawnd);
-					break;
-				case ZOMBIES_SPAWN_SYMBOL:
-					new_spawnz = new SpawnZombies(30, zombies_spawn_timer,
-										   		  Point(j, i));
-					this->spawns.push_back(new_spawnz);
-					row.push_back(new_spawnz);
-					break;
+				new_actor = new Wall(3, Point(j, i));
+				row.push_back(new_actor);
+			} else if (c == Config::instance().get_ground_symbol())
+			{
+				new_actor = new Ground(1, Point(j, i));
+				row.push_back(new_actor);
+			} else if (c == Config::instance().get_knight_symbol())
+			{
+				this->knight = new Knight(Config::instance().get_knight_hp(),
+										  Config::instance().get_knight_damage(),
+										  Point(j, i));
+				row.push_back(this->knight);
+			} else if (c == Config::instance().get_princess_symbol())
+			{
+				this->princess = new Princess(Config::instance().get_princess_hp(),
+											  0, Point(j, i));
+				row.push_back(this->princess);
+			} else if (c == Config::instance().get_zombie_symbol())
+			{
+				new_actor = new Zombie(Config::instance().get_zombie_hp(),
+									   Config::instance().get_zombie_damage(),
+									   Point(j, i));
+				this->actors.push_back(new_actor);
+				row.push_back(new_actor);
+			} else if (Config::instance().get_dragon_symbol())
+			{
+				new_actor = new Dragon(Config::instance().get_dragon_hp(),
+									   Config::instance().get_dragon_damage(),
+									   Point(j, i));
+				this->actors.push_back(new_actor);
+				row.push_back(new_actor);
+			} else if (Config::instance().get_wizard_symbol())
+			{
+				new_actor = new Wizard(Config::instance().get_wizard_hp(),
+									   Config::instance().get_wizard_damage(),
+									   Point(j, i));
+				this->actors.push_back(new_actor);
+				row.push_back(new_actor);
+			} else if (Config::instance().get_medkit_symbol())
+			{
+				new_actor = new Medkit(1,
+									   Config::instance().get_medkit_heal_power(),
+									   Point(j, i));
+				this->actors.push_back(new_actor);
+				row.push_back(new_actor);
+			} else if (Config::instance().get_dragons_spawn_symbol())
+			{
+				new_spawnd = new SpawnDragons(
+										60,
+										Config::instance().get_dragons_spawn_timer(),
+									   	Point(j, i));
+				this->spawns.push_back(new_spawnd);
+				row.push_back(new_spawnd);
+			} else if (Config::instance().get_zombies_spawn_symbol())
+			{
+				new_spawnz = new SpawnZombies(
+										30,
+										Config::instance().get_zombies_spawn_timer(),
+									   	Point(j, i));
+				this->spawns.push_back(new_spawnz);
+				row.push_back(new_spawnz);
 			}
 		}
 		map.push_back(row);
@@ -87,13 +95,15 @@ Point Map::findFreePlace(Point lp, Point rp)
 	rp = this->pointValidation(rp, RIGHT_SIDE);
 	for (int i = lp.y; i <= rp.y; i++)
 		for (int j = lp.x; j <= rp.x; j++)
-			if (this->map[i][j]->get_symbol() == GROUND_SYMBOL) c++;
+			if (this->map[i][j]->get_symbol() ==
+				Config::instance().get_ground_symbol()) c++;
 	int num = rand() % c + 1;
 	c = 0;
 	for (int i = lp.y; i <= rp.y; i++)
 		for (int j = lp.x; j <= rp.x; j++)
 		{
-			if (this->map[i][j]->get_symbol() == GROUND_SYMBOL) c++;
+			if (this->map[i][j]->get_symbol() ==
+				Config::instance().get_ground_symbol()) c++;
 			if (c == num) return this->map[i][j]->get_point();
 		}
 };
@@ -119,13 +129,15 @@ Point Map::findFreePlace()
 	Point lp(1, 1); Point rp(this->cols - 2, this->rows - 2);
 	for (int i = lp.y; i <= rp.y; i++)
 		for (int j = lp.x; j <= rp.x; j++)
-			if (this->map[i][j]->get_symbol() == GROUND_SYMBOL) c++;
+			if (this->map[i][j]->get_symbol() ==
+				Config::instance().get_ground_symbol()) c++;
 	int num = rand() % c + 1;
 	c = 0;
 	for (int i = lp.y; i <= rp.y; i++)
 		for (int j = lp.x; j <= rp.x; j++)
 		{
-			if (this->map[i][j]->get_symbol() == GROUND_SYMBOL) c++;
+			if (this->map[i][j]->get_symbol() ==
+				Config::instance().get_ground_symbol()) c++;
 			if (c == num) return this->map[i][j]->get_point();
 		}
 };
@@ -146,15 +158,14 @@ Point Map::get_right_ang()
 void Map::addActor(char c, Point p)
 {
 	Actor* actor;
-	switch(c)
-	{
-		case ZOMBIE_SYMBOL:
-			actor = new Zombie(zombie_health, zombie_damage, p); break;
-		case DRAGON_SYMBOL:
-			actor = new Dragon(dragon_health, dragon_damage, p); break;
-		case MEDKIT_SYMBOL:
-			actor = new Medkit(medkit_health, medkit_heal_power, p); break;
-	}
+	if (c == Config::instance().get_zombie_symbol())
+		actor = new Zombie(Config::instance().get_zombie_hp(),
+						   Config::instance().get_zombie_damage(), p);
+	else if (c == Config::instance().get_dragon_symbol())
+		actor = new Dragon(Config::instance().get_dragon_hp(),
+						   Config::instance().get_dragon_damage(), p);
+	else if (c == Config::instance().get_medkit_symbol())
+		actor = new Medkit(1, Config::instance().get_medkit_heal_power(), p);
 	this->addActor(actor);
 };
 

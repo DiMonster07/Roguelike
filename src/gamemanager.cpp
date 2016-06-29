@@ -34,13 +34,15 @@ int GameManager::actorsActions()
 {
 	for (int i = 0; i < this->map.actors.size(); i++)
 	{
-		if (this->map.actors[i]->get_symbol() != MEDKIT_SYMBOL)
+		if (this->map.actors[i]->get_symbol() !=
+			Config::instance().get_medkit_symbol())
 		{
 			Point direction = this->map.actors[i]->get_direction(this->map);
 			Point p = this->map.actors[i]->get_point() + direction;
 			int status = this->collide(this->map.actors[i], this->map.map[p.y][p.x]);
 			if (status) return status;
-			if (this->map.actors[i]->get_symbol() == WIZARD_SYMBOL)
+			if (this->map.actors[i]->get_symbol() ==
+				Config::instance().get_wizard_symbol())
 				this->map.actors[i]->specialSkill(this->map);
 		}
 	}
@@ -125,7 +127,9 @@ void GameManager::selectStartPos()
 	wrefresh(this->main_win);
 	if (this->map.knight == NULL)
 	{
-		this->map.knight = new Knight(knight_health, knight_damage, Point(1, 1));
+		this->map.knight = new Knight(Config::instance().get_knight_hp(),
+									  Config::instance().get_knight_damage(),
+									  Point(1, 1));
 		this->map.map[1][1] = this->map.knight;
 	}
 	this->refreshGrid();
@@ -164,9 +168,11 @@ void GameManager::generateUnits()
 	for (int i = 0; i < 15; i++)
 	{
 		pnt = this->map.findFreePlace();
-		this->map.addActor(ZOMBIE_SYMBOL, pnt);
+		this->map.addActor(Config::instance().get_zombie_symbol(), pnt);
 	}
-	this->map.spawns.push_back(new SpawnMedkit(1, medkit_spawn_timer, Point(0, 0)));
+	this->map.spawns.push_back(new SpawnMedkit(1,
+											   Config::instance().get_medkit_timer(),
+											   Point(0, 0)));
 };
 
 void GameManager::deleteActor(Actor *actor)
@@ -254,7 +260,6 @@ void GameManager::refreshInfo()
 	mvwprintw(this->info_win, 2, 0, "Damage: %d", this->map.knight->get_damage());
 	Point pnt = this->map.knight->get_point();
 	mvwprintw(this->info_win, 3, 0, "Coordinate: %d %d", pnt.y, pnt.x);
-	mvwprintw(this->info_win, 4, 0, "Medkits: %d", this->map.getActorsCount(MEDKIT_SYMBOL));
 	wrefresh(this->info_win);
 };
 
@@ -317,6 +322,25 @@ void initColorPairs()
 	init_pair(FIREBALL_COLOR, 7, 4);
 	init_pair(BASE_COLOR, 7, 0);
 };
+
+std::map<char, int> get_units_color()
+{
+	std::map<char, int> units_color =
+	{
+		{ Config::instance().get_ground_symbol(),        GROUND_COLOR },
+		{ Config::instance().get_wall_symbol(),          WALL_COLOR },
+		{ Config::instance().get_knight_symbol(),        KNIGHT_COLOR },
+		{ Config::instance().get_princess_symbol(),      PRINCESS_COLOR },
+		{ Config::instance().get_zombie_symbol(),        ZOMBIE_COLOR },
+		{ Config::instance().get_dragon_symbol(),        DRAGON_COLOR },
+		{ Config::instance().get_dragons_spawn_symbol(), DRAGONS_SPAWN_COLOR },
+		{ Config::instance().get_zombies_spawn_symbol(), ZOMBIES_SPAWN_COLOR },
+		{ Config::instance().get_medkit_symbol(),        MEDKIT_COLOR },
+		{ Config::instance().get_wizard_symbol(),        WIZARD_COLOR }
+	};
+	return units_color;
+};
+
 /*
 		COLOR_BLACK   0
         COLOR_RED     1

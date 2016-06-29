@@ -55,7 +55,7 @@ void Knight::collide(Fireball* fireball)
 
 char Knight::get_symbol()
 {
-	return KNIGHT_SYMBOL;
+	return Config::instance().get_knight_symbol();
 };
 
 int Knight::get_color()
@@ -143,7 +143,7 @@ int Fireball::get_color()
 
 char Zombie::get_symbol()
 {
-	return ZOMBIE_SYMBOL;
+	return Config::instance().get_zombie_symbol();
 };
 
 int Zombie::get_color()
@@ -153,7 +153,7 @@ int Zombie::get_color()
 
 char Dragon::get_symbol()
 {
-	return DRAGON_SYMBOL;
+	return Config::instance().get_dragon_symbol();
 };
 
 int Dragon::get_color()
@@ -173,14 +173,16 @@ void Wizard::specialSkill(Map& map)
 		else if (wpoint.y == kpoint.y)
 			dir = Point((wpoint.x > kpoint.x ? -1 : 1), 0);
 		wpoint = wpoint + dir;
-		if (map.isActorTypeInPlace(GROUND_SYMBOL, wpoint))
-	 		map.addActor(new Fireball(fireball_health, fireball_damage, wpoint, dir));
+		if (map.isActorTypeInPlace(Config::instance().get_ground_symbol(), wpoint))
+	 		map.addActor(new Fireball(1,
+									  Config::instance().get_fireball_damage(),
+									  wpoint, dir));
 	}
 };
 
 char Wizard::get_symbol()
 {
-	return WIZARD_SYMBOL;
+	return Config::instance().get_wizard_symbol();
 };
 
 int Wizard::get_color()
@@ -210,7 +212,7 @@ void Ground::collide(Fireball* fireball)
 
 char Ground::get_symbol()
 {
-	return GROUND_SYMBOL;
+	return Config::instance().get_ground_symbol();
 };
 
 int Ground::get_color()
@@ -230,7 +232,7 @@ void Wall::collide(Fireball* fireball)
 
 char Wall::get_symbol()
 {
-	return WALL_SYMBOL;
+	return Config::instance().get_wall_symbol();
 };
 
 int Wall::get_color()
@@ -256,7 +258,7 @@ void Princess::collide(Fireball* fireball)
 
 char Princess::get_symbol()
 {
-	return PRINCESS_SYMBOL;
+	return Config::instance().get_princess_symbol();
 };
 
 int Princess::get_color()
@@ -293,7 +295,7 @@ void Medkit::collide(Fireball* fireball)
 
 char Medkit::get_symbol()
 {
-	return MEDKIT_SYMBOL;
+	return Config::instance().get_medkit_symbol();
 };
 
 int Medkit::get_color()
@@ -307,14 +309,14 @@ void SpawnZombies::action(Map& map)
 	if (this->timer-- == 0)
 	{
 		Point p = map.findFreePlace(my_p - spawn_range, my_p + spawn_range);
-		map.addActor(ZOMBIE_SYMBOL, p);
-		this->timer = zombies_spawn_timer;
+		map.addActor(Config::instance().get_zombie_symbol(), p);
+		this->timer = Config::instance().get_zombies_spawn_timer();
 	}
 };
 
 char SpawnZombies::get_symbol()
 {
-    return ZOMBIES_SPAWN_SYMBOL;
+    return Config::instance().get_zombies_spawn_symbol();
 };
 
 int SpawnZombies::get_color()
@@ -327,12 +329,13 @@ void SpawnMedkit::action(Map& map)
 	Point my_p = this->get_point();
 	if (this->timer-- == 0)
 	{
-		if (map.getActorsCount(MEDKIT_SYMBOL) < medkit_max_count)
+		if (map.getActorsCount(Config::instance().get_medkit_symbol()) <
+			Config::instance().get_medkit_max_count())
 		{
 			Point p = map.findFreePlace();
-			map.addActor(MEDKIT_SYMBOL, p);
+			map.addActor(Config::instance().get_medkit_symbol(), p);
 		}
-		this->timer = medkit_spawn_timer;
+		this->timer = Config::instance().get_medkit_timer();
 	}
 };
 
@@ -342,14 +345,14 @@ void SpawnDragons::action(Map& map)
 	if (this->timer-- == 0)
 	{
 		Point p = map.findFreePlace(my_p - spawn_range, my_p + spawn_range);
-		map.addActor(DRAGON_SYMBOL, p);
-		this->timer = dragon_spawn_timer;
+		map.addActor(Config::instance().get_dragon_symbol(), p);
+		this->timer = Config::instance().get_dragons_spawn_timer();
 	}
 };
 
 char SpawnDragons::get_symbol()
 {
-    return DRAGONS_SPAWN_SYMBOL;
+    return Config::instance().get_dragons_spawn_symbol();
 };
 
 int SpawnDragons::get_color()

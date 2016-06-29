@@ -1,9 +1,10 @@
 #pragma once
+#include <iostream>
 #include <ncurses.h>
 #include <panel.h>
 #include <vector>
-#include <iostream>
 #include "point.h"
+#include "config.h"
 #include "map.h"
 
 class Actor
@@ -94,8 +95,7 @@ class Fireball: public Character
 private:
 	Point direction;
 public:
-	Fireball() : direction(Point()), Character(fireball_health, fireball_damage,
-												 Point()) { };
+	Fireball() { };
 	Fireball(int h, int d, Point p, Point dir) : direction(dir),
 												 Character(h, d, p) { };
 	int get_color();
@@ -233,7 +233,7 @@ public:
 class Medkit: public Object
 {
 public:
-	Medkit() : Object(medkit_health, medkit_heal_power, Point()) { };
+	Medkit() { };
 	Medkit(int h, int v, Point p) : Object(h, v, p) { };
 	int get_color();
 	char get_symbol();

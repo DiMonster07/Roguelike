@@ -3,7 +3,8 @@
 
 int main(int argc, char **argv)
 {
-	Config::instance().Parse("../src/config.cfg");
+	Config::instance().parse("../src/config.cfg");
+	Config::instance().setVariables();
 	GameManager::instance().initConsole();
 	GameManager::instance().createGrids();
 	GameManager::instance().menuLoop();
